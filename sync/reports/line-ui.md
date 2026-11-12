@@ -2,7 +2,15 @@
 
 Places where this project's own documentation or help text disagrees with its code at the documented ref. Under D6 they are recorded here and not fixed in the project. Pages follow the code (D2).
 
-- **Ref:** `npm-published (line-components@0.2.4 and siblings)` (`a4f021dc5cb8`)
+- **Ref:** the npm-published versions, one source each:
+  - `@websublime/line-tokens@0.1.3` (`f14dcb68b7ab`)
+  - `@websublime/line-colors@0.1.3` (`f14dcb68b7ab`)
+  - `@websublime/line-themes@0.1.2` (`c92cabe48560`)
+  - `@websublime/line-schemas@0.1.1` (`a3ee3088c0f1`)
+  - `@websublime/line-utils@0.1.0` (`10efd04c477b`)
+  - `@websublime/line-core@0.2.2` (`d1c542d542da`)
+  - `@websublime/line-components@0.2.4` (`a4f021dc5cb8`), which also covers the root `README.md`
+  - `@websublime/line-icons@0.2.0` (`28cd062dbbd2`)
 - **Checked:** 2026-11-12
 
 ## Open

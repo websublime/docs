@@ -4,9 +4,10 @@
 //   bun scripts/sync.ts [--project <slug>] [--offline] [--json]
 //       Per source: newer stable release (reported only, never applied), the
 //       files changed in lastSynced..ref, and the pages they affect.
-//   bun scripts/sync.ts --mark-synced <slug>
-//       Set lastSynced to the resolved ref of every source of <slug>. Run it in
-//       the same pull request that updates the pages (knowledge/sync.md).
+//   bun scripts/sync.ts --mark-synced <slug> [--at <sha>]
+//       Set lastSynced to the locally resolved ref of every source of <slug>
+//       (no fetch), or to <sha> for a single-source project. Run it in the same
+//       pull request that updates the pages (knowledge/sync.md).
 //   bun scripts/sync.ts --validate
 //       Registry structure and page files only; no checkouts needed (CI).
 
@@ -41,9 +42,16 @@ const registry = Bun.YAML.parse(readFileSync(registryPath, "utf8")) as Registry;
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.includes(name);
+// Value of `--name <value>`; exits when the value is missing or is another flag.
 const option = (name: string) => {
   const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : undefined;
+  if (i < 0) return undefined;
+  const value = args[i + 1];
+  if (!value || value.startsWith("--")) {
+    console.error(`${name} needs a value`);
+    process.exit(1);
+  }
+  return value;
 };
 
 function git(checkout: string, ...rest: string[]): string {
@@ -54,8 +62,8 @@ function git(checkout: string, ...rest: string[]): string {
 
 // Semver order, with a final release ranked above its prereleases.
 function compareVersions(a: string, b: string): number {
-  const [coreA, preA] = a.split("-", 2);
-  const [coreB, preB] = b.split("-", 2);
+  const [coreA, preA] = a.includes("-") ? [a.slice(0, a.indexOf("-")), a.slice(a.indexOf("-") + 1)] : [a, ""];
+  const [coreB, preB] = b.includes("-") ? [b.slice(0, b.indexOf("-")), b.slice(b.indexOf("-") + 1)] : [b, ""];
   const partsA = coreA.split(".").map(Number);
   const partsB = coreB.split(".").map(Number);
   for (let i = 0; i < 3; i++) if (partsA[i] !== partsB[i]) return partsA[i] - partsB[i];
@@ -93,8 +101,13 @@ if (flag("--validate")) {
       if (s.channel === "branch" ? !s.branch : !s.tagPattern) problems.push(`${at}: channel ${s.channel} needs ${s.channel === "branch" ? "branch" : "tagPattern"}`);
       if (s.tagPattern && !new RegExp(s.tagPattern).exec(s.ref)?.[1]) problems.push(`${at}: tagPattern does not capture a version from ref ${s.ref}`);
       if (!/^[0-9a-f]{40}$/.test(s.lastSynced ?? "")) problems.push(`${at}: lastSynced must be a full commit sha`);
-      for (const page of Object.keys(s.watch ?? {}))
+      const watch = s.watch ?? {};
+      if (!Object.keys(watch).length) problems.push(`${at}: watch must map at least one page`);
+      for (const [page, globs] of Object.entries(watch)) {
         if (!existsSync(join(root, `${page}.mdx`))) problems.push(`${at}: watched page ${page}.mdx does not exist`);
+        if (!Array.isArray(globs) || !globs.length || globs.some((g) => typeof g !== "string" || !g))
+          problems.push(`${at}: watch for ${page} must be a non-empty list of globs`);
+      }
     }
   }
   if (problems.length) {
@@ -105,11 +118,19 @@ if (flag("--validate")) {
   process.exit(0);
 }
 
+// --mark-synced never fetches: it records what the local checkout resolves the
+// ref to, which is what the agent read. For a branch-tracked source, pass the
+// exact sha that was read with --at <sha> (single-source projects only).
 const markSlug = option("--mark-synced");
+const markAt = option("--at");
 const only = markSlug ?? option("--project");
 const projects = registry.projects.filter((p) => !only || p.slug === only);
 if (only && !projects.length) {
   console.error(`unknown project: ${only}`);
+  process.exit(1);
+}
+if (markAt && (!markSlug || projects[0].sources.length !== 1)) {
+  console.error("--at needs --mark-synced <slug> for a project with exactly one source");
   process.exit(1);
 }
 
@@ -117,11 +138,11 @@ const report = [];
 for (const project of projects) {
   const checkout = resolve(root, project.checkout);
   if (!existsSync(checkout)) throw new Error(`${project.slug}: checkout ${project.checkout} not found`);
-  if (!flag("--offline")) git(checkout, "fetch", "--quiet", "--tags", "origin");
+  if (!flag("--offline") && !markSlug) git(checkout, "fetch", "--quiet", "--tags", "origin");
   const excluded = project.exclude.map((g) => new Bun.Glob(g));
 
   for (const source of project.sources) {
-    const refSha = git(checkout, "rev-parse", `${source.ref}^{commit}`);
+    const refSha = git(checkout, "rev-parse", `${markAt ?? source.ref}^{commit}`);
     if (markSlug) {
       source.lastSynced = refSha;
       continue;
@@ -130,7 +151,7 @@ for (const project of projects) {
     const changed =
       refSha === source.lastSynced
         ? []
-        : git(checkout, "diff", "--name-only", source.lastSynced, refSha)
+        : git(checkout, "diff", "--name-only", "--no-renames", source.lastSynced, refSha)
             .split("\n")
             .filter((f) => f && !excluded.some((g) => g.match(f)));
     const pages: Record<string, string[]> = {};

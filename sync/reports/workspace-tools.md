@@ -18,9 +18,9 @@ Places where this project's own documentation or help text disagrees with its co
 | 7 | `crates/node/src/lib.rs:96` | Example passes `bumpType` | Field is `bump` (`types/changeset.rs:225`) | not on any page yet |
 | 8 | `packages/workspace-tools/README.md:104,136` | Function tables list `configShow` twice and omit `configValidate`, `upgradeCheck` | Both exported (`crates/node/src/lib.rs:170,174`) | not on any page yet |
 | 9 | `packages/workspace-tools/README.md:3` | Badge for a `CI` workflow | No such workflow; names are Pull Request, Pull Request Node.js Bindings, Release Crates, Release Binaries, Release Node.js Bindings (`.github/workflows/`) | not on any page yet |
-| 10 | `README.md:598-606`, `RELEASE.md:4-12` | Releases run through Release Please | release-plz with git-cliff (`release-plz.toml`, `cliff.toml`) and cargo-dist (`.github/workflows/release.yml`) | not on any page yet |
+| 10 | `README.md:598-606`, and the maintainer release notes | Releases run through Release Please | release-plz with git-cliff (`release-plz.toml`, `cliff.toml`) and cargo-dist (`.github/workflows/release.yml`) | not on any page yet |
 | 11 | `README.md:375,575` | Crate `sublime_package_tools` | Crate is `sublime_pkg_tools` (`crates/pkg/Cargo.toml`) | not on any page yet |
-| 12 | `README.md:698-699` | Links `crates/cli/STORY_MAP.md`, `crates/cli/PLAN.md` | Neither file exists at that path; the targets are internal planning material | not on any page yet |
+| 12 | `README.md:698-699` | Links two internal planning documents under `crates/cli/` | Neither file exists at the linked path; the targets are internal planning material | not on any page yet |
 | 13 | `README.md:666,668` | Config also read from `SUBLIME_*`/`WORKSPACE_*` env vars and `~/.config/sublime/config.toml` | Loader reads only `--config` or `repo.config.*` (`crates/cli/src/commands/mod.rs:66,107-110,153`) | not on any page yet |
 | 14 | `crates/cli/src/commands/config.rs:17` | `config` "applies environment variable overrides" | No env lookup in `config.rs`; config comes from `from_str` only (`commands/mod.rs:153`) | not on any page yet |
 | 15 | `scripts/git-hooks/README.md:178` | `[git_hooks]` section in `.workspace.toml` | Not a `PackageToolsConfig` field (`crates/pkg/src/config/types.rs:91-150`) | not on any page yet |

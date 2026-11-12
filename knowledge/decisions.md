@@ -331,13 +331,15 @@ Agents and humans read it before they change anything in this repository.
      - the pages those files affect;
      - the unmapped files.
 
-     `--mark-synced <slug>` moves `lastSynced` to the resolved ref, in the same pull request as the page updates. `--validate` checks the structure in CI.
+     `--mark-synced <slug>` moves `lastSynced` to the resolved ref, in the same pull request as the page updates. It never fetches, and `--at <sha>` records the exact commit read on a single-source project (needed for branch-tracked projects). The diff uses `--no-renames`, so a moved file also reports its old path. `--validate` checks the structure in CI, including that every source watches at least one page.
   3. **Newer releases are reported, never applied.** Moving `ref` needs an intent and Miguel's confirmation (D5).
   4. **The procedure** lives in `knowledge/sync.md`, which any agent can follow. `.claude/commands/docs-sync.md` points to it.
   5. **`scripts/leak-lint.ts`** (CI) fails on internal ids, internal-doc paths, agent-file names and Portuguese text in published `.mdx` files and `docs.json`.
-     - An intended exception carries `{/* leak-lint: allow <reason> */}` on the same line, and applies to that line only.
+     - The rules cover the agent folders (`.agents/`, `.beads/`) and spikes. The Portuguese rule uses Unicode-aware boundaries. `.mintignore` is read with gitignore semantics, and negations fail the lint.
+     - An intended exception carries `{/* leak-lint: allow <reason> */}` on the same line, and applies to that line only. It cannot be used inside fenced code (knowledge/sync.md).
      - A marker without a reason is a finding.
   6. **Reports:** `sync/reports/<slug>.md` lists the open contradictions at the ref, with file:line evidence, and the inventory items not reproduced at the ref.
-     - The header sha is the **commit** the ref resolves to (`<ref>^{commit}`), not the tag object.
+     - The header sha is the **commit** the ref resolves to (`<ref>^{commit}`), not the tag object. Projects with several sources list each one.
+     - Reports describe internal material without naming internal files.
      - `sync/` is excluded from the site.
 - **Why:** Miguel's choices on issue #5.

@@ -6,6 +6,7 @@ projects:
     status: stable
     accent: indigo
     exclude:
+      - .changesets/history/**
       - CLAUDE.md
       - AGENTS.md
       - .claude/**
@@ -83,6 +84,8 @@ projects:
     status: wip
     accent: lime
     exclude:
+      - .mcp.json
+      - .omp/**
       - docs/**
       - .claude/**
       - temp/**
@@ -235,6 +238,7 @@ projects:
     status: wip
     accent: orange
     exclude:
+      - RELEASING.md
       - docs/PRD.md
       - docs/PROCESS.md
       - docs/STYLE.md

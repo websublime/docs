@@ -20,30 +20,49 @@ const rules: Rule[] = [
   { id: "section-ref", pattern: /§\s*\d|\bspine\b/i, why: "reference into an internal design document" },
   {
     id: "internal-path",
-    pattern: /docs\/(?:plans|specs|context|research|retrospective)\b|\bhistory\/|\.knowledge\/|plano-de-migracao|\bPRD\b|\bPROCESS\.md\b|\bSTYLE\.md\b|docs\/0\d-/,
+    pattern: /docs\/(?:plans|specs|spikes|context|research|retrospective)\b|(?:^|[\s`'"(/])spikes\/|\bhistory\/|\.knowledge\/|plano-de-migracao|\bPRD\b|\bPROCESS\.md\b|\bSTYLE\.md\b|docs\/0\d-/,
     why: "path or name of internal project documentation",
   },
-  { id: "agent-file", pattern: /\bCLAUDE\.md\b|\bAGENTS\.md\b|\.claude\//, why: "agent instruction file" },
+  { id: "agent-file", pattern: /\bCLAUDE\.md\b|\bAGENTS\.md\b|\.claude\/|\.agents\/|\.beads\//, why: "agent instruction file or folder" },
   { id: "temp-dir", pattern: /(?:^|[\s`'"(/])temp\//, why: "scratch directory" },
-  { id: "portuguese", pattern: /ção|ções|ões\b|\bnão\b|também|está\b|então|você/i, why: "Portuguese text (the site is English, D4)" },
+  // Accented letters are not word characters for \b, so use Unicode-aware lookarounds.
+  {
+    id: "portuguese",
+    pattern: /ção|ções|ões(?![\p{L}\d])|(?<![\p{L}\d])(?:não|também|está|então|você)(?![\p{L}\d])/iu,
+    why: "Portuguese text (the site is English, D4)",
+  },
 ];
 
 const marker = /\{\/\*\s*leak-lint:\s*allow\b(.*?)\*\/\}/;
 
 // Published files: every .mdx outside the paths excluded by .mintignore, plus docs.json.
+// .mintignore follows gitignore rules: a pattern with no inner slash matches at any
+// depth; a trailing slash matches directories only. Negations are not supported.
 const ignored = existsSync(join(root, ".mintignore"))
   ? readFileSync(join(root, ".mintignore"), "utf8")
       .split("\n")
       .map((l) => l.trim())
       .filter((l) => l && !l.startsWith("#"))
+      .map((line) => {
+        if (line.startsWith("!")) {
+          console.error(`leak-lint: .mintignore negation "${line}" is not supported; list what is ignored instead`);
+          process.exit(1);
+        }
+        const dirOnly = line.endsWith("/");
+        const core = line.replace(/^\/|\/$/g, "");
+        return { glob: new Bun.Glob(core), dirOnly, anchored: line.startsWith("/") || core.includes("/") };
+      })
   : [];
 const files = [...new Bun.Glob("**/*.mdx").scanSync({ cwd: root, dot: false })]
-  .filter(
-    (rel) =>
-      !rel.split("/").some((part) => part.startsWith(".")) &&
-      !rel.startsWith("node_modules/") &&
-      !ignored.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p || new Bun.Glob(p).match(rel))),
-  )
+  .filter((rel) => {
+    const parts = rel.split("/");
+    if (parts.some((part) => part.startsWith(".")) || parts[0] === "node_modules") return false;
+    return !ignored.some(({ glob, dirOnly, anchored }) => {
+      // Candidate paths: every directory prefix, plus the file itself unless dirOnly.
+      const prefixes = parts.slice(0, dirOnly ? -1 : undefined).map((_, i) => parts.slice(0, i + 1).join("/"));
+      return anchored ? prefixes.some((p) => glob.match(p)) : prefixes.some((p) => glob.match(p.split("/").pop()!));
+    });
+  })
   .sort();
 files.push("docs.json");
 

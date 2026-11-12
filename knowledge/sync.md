@@ -8,7 +8,7 @@ This is how an agent, or a human, keeps the project pages in step with each proj
 |---|---|
 | `bun scripts/sync.ts` | For every project: whether a newer release exists, the files changed between `lastSynced` and the ref, and the pages those files affect |
 | `bun scripts/sync.ts --project <slug> --json` | The same for one project, as JSON |
-| `bun scripts/sync.ts --mark-synced <slug>` | Sets `lastSynced` to the resolved ref of every source of `<slug>` |
+| `bun scripts/sync.ts --mark-synced <slug> [--at <sha>]` | Sets `lastSynced` to what the local checkout resolves each source's ref to, without fetching. For a single-source project, `--at <sha>` records that exact commit instead |
 | `bun scripts/sync.ts --validate` | Checks the registry structure and that every watched page exists (runs in CI) |
 | `bun scripts/leak-lint.ts` | Fails on internal material in published files (D3; runs in CI) |
 
@@ -38,8 +38,10 @@ The script rewrites the whole file when it marks a project as synced, so edit th
    4. Update `sync/reports/<slug>.md`:
       - add the contradictions you found;
       - move rows the ref has fixed to "Not reproduced at this ref";
-      - update the header's ref and sha.
+      - update the header's ref and commit sha, one line per source when the project has several (`<ref>^{commit}`, never the tag object).
    5. When the pages state what the ref says, run `bun scripts/sync.ts --mark-synced <slug>` in the same pull request (process stage 5).
+      - The command does not fetch, so it records what you read.
+      - For a branch-tracked project such as focus, pass the commit you read: `--mark-synced focus --at <sha>`. The branch may have moved since then.
 4. **Check locally:** `bun scripts/leak-lint.ts`, `bun scripts/sync.ts --validate`, `npx mint@4.3.19 validate`, `npx mint@4.3.19 broken-links`, `vale *.mdx */*.mdx`. Then open the pull request and follow D15 to the end.
 
 ## Leak-lint exceptions
@@ -51,3 +53,5 @@ Write the wiring block into `AGENTS.md`. {/* leak-lint: allow unblock itself wri
 ```
 
 A marker without a reason is itself a finding.
+
+Inside fenced code blocks, MDX shows `{/* … */}` as literal text, so a marker cannot be used there. If a code sample needs a flagged name (for example a command that writes `AGENTS.md`), take the decision to Miguel in the intent. Do not work around the lint.
