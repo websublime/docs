@@ -1,0 +1,3 @@
+# Design archives dropped into the knowledge base (their images are converted into images/)
+knowledge/*.zip
+.DS_Store
