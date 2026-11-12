@@ -242,3 +242,21 @@ Agents and humans read it before they change anything in this repository.
   - Only the app can re-run its checks: GitHub's rerequest API returns 404 for us, and Redeploy in the Mintlify dashboard rebuilds the preview, not the checks.
   - Without this rule, every pull request that only changes the knowledge base would stay blocked.
 - **Follow-up:** reported to Mintlify through `mint feedback` on 2026-11-12. Drop this exception if Mintlify fixes the behaviour.
+
+## D19: An internal error in a Mintlify App check does not block when the equivalent CI check passes
+
+- **Status:** accepted (2026-11-12, conversation, PR #2). Amends the gate in D15, alongside D18.
+- **Decision:** A Mintlify GitHub App check does not block a pull request when all of these hold:
+  1. Its conclusion is `failure` with the summary "An unknown error occurred".
+  2. Its own output shows no finding.
+  3. The equivalent check in our `CI` workflow passed on the same commit. `link-rot` maps to `mint broken-links`; `vale-spellcheck` has no CI equivalent, so this rule never covers it.
+- Every time this rule is used, record in the pull request:
+  - the check-run id;
+  - the line of its output that shows no finding;
+  - the `mint feedback` report sent to Mintlify.
+- A Mintlify check that reports actual findings always blocks.
+- **Why:**
+  - On commit `8dacf0b`, `link-rot` (check run 131275741168) failed with "An unknown error occurred", while its output said "Checked for broken links and found none in 276.91ms".
+  - `mint broken-links` passed in CI and locally.
+  - Only the Mintlify app can re-run its checks: Redeploy in the dashboard rebuilt the preview but did not re-run the check.
+- **Follow-up:** reported through `mint feedback` on 2026-11-12. Drop this exception if Mintlify fixes the behaviour.

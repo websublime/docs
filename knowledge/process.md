@@ -43,6 +43,8 @@ flowchart LR
   - the checks the Mintlify GitHub App adds: `Mintlify Deployment` (preview build), `link-rot` and `vale-spellcheck`.
 
   A pull request with any red check is not ready. One exception (D18): when `Mintlify Deployment` is **skipped** for the head commit because it touched only `.mintignore` paths, the app's validation checks do not count. The `CI` workflow is then the gate. A failed deployment always blocks.
+
+  A second exception (D19): an app check that fails with "An unknown error occurred", whose own output shows no finding, does not block when its CI equivalent passed (`link-rot` ↔ `mint broken-links`). Record the check-run id and the Mintlify report in the pull request.
 - **When CI fails:**
   - stop;
   - read the failing log;
