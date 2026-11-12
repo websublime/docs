@@ -298,6 +298,7 @@ Agents and humans read it before they change anything in this repository.
   - Correct technical terms flagged by `vale-spellcheck` go into the `websublime` vocabulary, one regex per line. Never reword correct content just to quiet the linter.
   - Real misspellings get fixed in the page.
 - **Amendment (2026-11-12, issue #9):** the `{…}` **block** ignore now matches a single line (`(?m)^(\{[^\n]*\})$`). Mintlify's `(?sm)^({.+.*})` matched from any line that starts with `{`, such as a JSON code block, to the end of the file. That broke code-fence detection and sent code to the speller (for example `session_mode` inside a JSON sample). The token ignores are unchanged.
+- **Amendment (2026-11-12, PR #10):** a local `vale` run is not a full stand-in for Mintlify's check. Mintlify's dictionary flagged words that local Vale 3.26 accepts, such as distroless, loopback and userinfo. When `vale-spellcheck` reports correct terms, add them to the `websublime` vocabulary in the same pull request. The vocabulary file is kept sorted.
 - **Why:** On PR #4, `vale-spellcheck` reported 37 findings. All of them were correct technical terms: changesets, monorepos, Hono, Vitest, glibc, musl, Streamable and similar. Mintlify's built-in vocabulary cannot be extended without a repository config.
 
 ## D22: Images and design previews
