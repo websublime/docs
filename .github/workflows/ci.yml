@@ -45,3 +45,14 @@ jobs:
         with:
           node-version: 22
       - run: node scripts/line-ui.mjs --check
+
+  content-guards:
+    name: leak lint and sync registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun scripts/leak-lint.ts
+      - run: bun scripts/sync.ts --validate

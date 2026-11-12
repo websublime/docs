@@ -49,7 +49,11 @@ npx mint@4.3.19 validate
 npx mint@4.3.19 broken-links
 node scripts/line-ui.mjs --check   # the line://ui styles and chrome colours match the pinned versions
 vale *.mdx */*.mdx                  # same Vale config as Mintlify's vale-spellcheck (D21)
+bun scripts/leak-lint.ts            # no internal material on published pages (D3)
+bun scripts/sync.ts --validate      # sync registry structure (D7)
 ```
+
+To keep the project pages current, follow `knowledge/sync.md` (`/docs-sync` in Claude Code).
 
 For visual changes, preview with `npx mint@4.3.19 dev` in both light and dark mode.
 

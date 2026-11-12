@@ -9,11 +9,10 @@ This is the memory of the websublime documentation hub. It holds the decisions, 
 | [research/mintlify-platform.md](research/mintlify-platform.md) | Checked facts about the Mintlify plan, navigation, page modes, customisation, packages and CLI |
 | [research/line-ui-design-system.md](research/line-ui-design-system.md) | Analysis of the line://ui design system, the hue table, and the Mintlify spike results |
 | [projects/](projects/README.md) | One inventory per documented project, plus the template for adding a project |
+| [sync.md](sync.md) | Sync procedure: registry, `scripts/sync.ts`, reports, leak-lint exceptions |
 
 ## Not built yet
 
 These pieces are described by the decisions but do not exist yet. Each one arrives through its own intent (D15):
 
-- `sync/registry.yaml`, `sync/reports/` and the local sync command (D7, D6);
-- the leak lint for internal material (D3);
-- full project pages beyond each Overview (one sync intent per project).
+- full project pages beyond each Overview (one intent per project).

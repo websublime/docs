@@ -13,3 +13,6 @@ CLAUDE.md
 
 # Repository tooling
 scripts/
+
+# Sync registry and source reports (D7, D6)
+sync/
