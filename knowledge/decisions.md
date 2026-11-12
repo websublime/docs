@@ -361,3 +361,10 @@ Agents and humans read it before they change anything in this repository.
   - **CI** runs `bun scripts/gen.ts --check`.
   - **Sync order:** update the pages, then `--mark-synced`, then `bun scripts/gen.ts --project <slug>`.
 - **First use:** `trunks/reference/cli` (from `docs/guide/reference/cli.md`, which Trunks generates from its binary) and `trunks/changelog`.
+- **Amendment (2026-11-12, PR #10 review):** the MDX conversion follows CommonMark structure:
+  - Fences open and close with the same character and length.
+  - Inline code spans may wrap across lines.
+  - Outside code: every `<` becomes `&lt;`, except autolinks, which become links. `{` and `}` are escaped. Existing backslash escapes are kept. HTML comments are dropped.
+  - `keep-a-changelog` ignores headings inside code fences, reads linked headings, en-dash dates and `[YANKED]`, and removes only the version link definitions.
+  - `--project` with an unknown slug fails. A full `--check` also fails on an orphan generated page, meaning one that has the generated header but no registry entry.
+  - Tested by compiling edge cases with `@mdx-js/mdx`.

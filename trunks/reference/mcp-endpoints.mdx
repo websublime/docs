@@ -58,14 +58,15 @@ Resource subscriptions, resource templates and list-change notifications are not
 
 A tool result with `isError: true` is the tool's own answer, not a JSON-RPC error.
 
-Some failures happen before the MCP layer and are plain HTTP answers with a JSON body:
+Some failures happen before the MCP layer and are plain HTTP answers:
 
-| Status | When |
-|---|---|
-| 401 | Enterprise mode with a missing or invalid MCP client token. |
-| 403 | The server is not initialized, or the `Host` header is not allowed. |
-| 404 | The tool group does not exist: `{"error":"tool group: <name> not found"}`. |
-| 413 | The body is larger than 4 MiB. |
+| Status | When | Body |
+|---|---|---|
+| 401 | Enterprise mode with a missing or invalid MCP client token. | JSON |
+| 403 | The server is not initialized. | JSON |
+| 403 | The `Host` header is not allowed. | Plain text, from the MCP transport |
+| 404 | The tool group does not exist. | JSON: `{"error":"tool group: <name> not found"}` |
+| 413 | The body is larger than 4 MiB. | Plain text, from the MCP transport |
 
 ## Client authentication
 

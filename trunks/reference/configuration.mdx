@@ -29,7 +29,7 @@ A variable set in the environment always wins over the same variable in `.env`. 
 | `--database-url` | `TRUNKS_DATABASE_URL` | `sqlite://<path>` or `postgres://user:pass@host:port/db`. | `sqlite://trunks.db` |
 | `--database-url-file` | `TRUNKS_DATABASE_URL_FILE` | File that holds the database URL, for a secret mounted as a file. Takes precedence over the URL. Surrounding whitespace is ignored. An unreadable or empty file is a start-up error. | unset |
 | `--public-url` | `TRUNKS_PUBLIC_URL` | The server's address as browsers see it, for example `https://trunks.example.com`. Decides the session cookie's `Secure` flag and the accepted `Origin`. Required for single sign-on. | unset |
-| `--allowed-hosts` | `TRUNKS_ALLOWED_HOSTS` | Comma-separated `Host` header values accepted on the MCP endpoints, as protection against DNS rebinding. `*` turns the check off. | loopback names only (`localhost`, `127.0.0.1`) |
+| `--allowed-hosts` | `TRUNKS_ALLOWED_HOSTS` | Comma-separated `Host` header values accepted on the MCP endpoints, as protection against DNS rebinding. `*` turns the check off. | empty: only `localhost`, `127.0.0.1` and `::1` |
 
 <Warning>
 Development mode has no authentication. If you bind it to anything other than a loopback address, Trunks logs a warning: everyone who can reach that address can manage the server and run the commands of its stdio upstreams.
@@ -141,7 +141,7 @@ Some commands take a JSON file with `-c`:
 - `trunks create group` and `trunks update group`, for a tool group ([format](/trunks/guides/tool-groups));
 - `trunks create user` and `trunks create mcp-client` ([enterprise mode](/trunks/guides/enterprise-mode)).
 
-Before sending the file, the CLI replaces every `$\{VAR\}` inside any JSON string, at any depth, with the environment variable `VAR` of the CLI process. Use this to keep secrets out of the file:
+Before sending the file, the CLI replaces every `${VAR}` inside any JSON string, at any depth, with the environment variable `VAR` of the CLI process. Use this to keep secrets out of the file:
 
 ```json server.json
 {
@@ -154,8 +154,8 @@ Before sending the file, the CLI replaces every `$\{VAR\}` inside any JSON strin
 
 The rules:
 
-- Only the `$\{NAME\}` form is recognized. `$NAME` stays as it is.
+- Only the `${NAME}` form is recognized. `$NAME` stays as it is.
 - A name has letters, digits and `_` only.
 - A variable that is not set is an error. Trunks never substitutes an empty string.
-- An unterminated `$\{` is an error.
+- An unterminated `${` is an error.
 - Numbers, booleans and object keys are not expanded.

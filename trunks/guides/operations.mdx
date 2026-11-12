@@ -48,7 +48,7 @@ Trunks speaks plain HTTP. In production, put it behind a reverse proxy that term
 |---|---|---|
 | `TRUNKS_BIND_HOST` / `TRUNKS_PORT` | where Trunks listens; port `8080` by default. An empty host means every interface | an internal interface, or a port published only to the proxy |
 | `TRUNKS_PUBLIC_URL` | the address as seen from outside | `https://trunks.example.com`. It decides the cookie's `Secure` flag, the origin accepted for changes made with a browser session, and the [single sign-on](/trunks/guides/single-sign-on) redirect |
-| `TRUNKS_ALLOWED_HOSTS` | comma-separated `Host` headers accepted on the MCP endpoints, against DNS rebinding; only loopback names by default | the public host name; any other `Host` gets 403 |
+| `TRUNKS_ALLOWED_HOSTS` | comma-separated `Host` headers accepted on the MCP endpoints, against DNS rebinding; when empty, only `localhost`, `127.0.0.1` and `::1` | the public host name; any other `Host` gets 403 |
 
 At the proxy:
 
@@ -134,7 +134,8 @@ See the [changelog](/trunks/changelog) for what changes between versions.
 | start-up fails mentioning the mode | `TRUNKS_MODE` differs from the mode the database was initialized with |
 | start-up fails mentioning the `sse` transport | an enabled server uses the unsupported `sse` transport; re-register it as `streamable_http`, disable it, or set `TRUNKS_IGNORE_SSE_SERVERS=1` |
 | an MCP client gets 403 as soon as it connects | the `Host` it uses is not in `TRUNKS_ALLOWED_HOSTS` |
-| `401 invalid MCP client token` | a user's token on an MCP endpoint (or the reverse); they are different identities |
+| `401 invalid MCP client token` | a user's token on an MCP endpoint; users and MCP clients are different identities |
+| `401 invalid access token: no user matches this token` | an MCP client's token on the REST API (or a wrong or replaced user token) |
 | a user or client sees nothing | a grant is missing (`trunks grant …`) or the server is not in the client's allow list |
 | `tool '…' not found` for a tool that exists | it is disabled, outside the group, or out of the caller's reach; the answer is the same on purpose |
 | `failed to spawn 'npx'` | the distroless image has no `npx`; use the `-stdio` image |

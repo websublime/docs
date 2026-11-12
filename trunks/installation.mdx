@@ -158,7 +158,7 @@ The repository ships two compose files.
         docker compose -f docker-compose.prod.yaml up -d
         ```
 
-        Trunks waits for PostgreSQL to pass its health check, then listens on `127.0.0.1:8080`.
+        Trunks waits for PostgreSQL to pass its health check, then starts. It listens on `0.0.0.0:8080` inside the container; the compose file publishes that port on the host's `127.0.0.1:8080` only.
       </Step>
       <Step title="Initialize the server">
         Put a TLS-terminating reverse proxy in front of port `8080`, then initialize the server once:

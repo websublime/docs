@@ -59,7 +59,7 @@ All server settings are in the [configuration reference](/trunks/reference/confi
 
 ## How identities are handled
 
-- Trunks identifies a person by the provider's issuer and subject. The first sign-in creates a Trunks user named after `preferred_username`, else `email`, else the subject.
+- Trunks identifies a person by the provider's issuer and subject. The first sign-in creates a Trunks user named after `preferred_username`, else `email`, else the subject. If that name is longer than 100 characters or contains whitespace, Trunks uses the subject instead, without whitespace and cut to 100 characters.
 - Trunks never attaches a provider identity to an existing local user of the same name; it refuses that sign-in. This keeps a provider account called `admin` from taking over the local administrator. To let that person in, an administrator removes the local user first.
 - Of a browser session, the database stores only a hash.
 

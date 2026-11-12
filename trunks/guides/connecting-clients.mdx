@@ -119,7 +119,7 @@ Set the URL and the `Authorization` header wherever the client takes a remote (S
 
 | Symptom | Cause |
 |---|---|
-| `403 Forbidden: Host header is not allowed` | The host name the client uses isn't in `TRUNKS_ALLOWED_HOSTS`. By default, only loopback names (`localhost`, `127.0.0.1`) are accepted. Set it to the server's public name. |
+| `403 Forbidden: Host header is not allowed` | The host name the client uses isn't in `TRUNKS_ALLOWED_HOSTS`. When it is empty, only `localhost`, `127.0.0.1` and `::1` are accepted. Set it to the server's public name. |
 | `401 missing MCP client access token` | Enterprise mode, and the client sent no `Authorization` header. |
 | `401 invalid MCP client token` | The token isn't an MCP client token: it's wrong, replaced, or a user token. |
 | `403 server is not initialized` | Enterprise server on which `trunks init-server` hasn't run. |

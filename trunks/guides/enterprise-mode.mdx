@@ -16,7 +16,7 @@ This page covers local identities and access. To sign people in through an ident
     TRUNKS_MODE=enterprise trunks start
     ```
 
-    A new enterprise server refuses every request with `403 server is not initialized` until you initialize it.
+    Until you initialize it, a new enterprise server answers the REST API, the dashboard API and the MCP endpoints with `403 server is not initialized`. `GET /health`, `GET /metadata`, `GET /metrics`, `POST /init`, `GET /auth/config`, `POST /auth/logout` and the web console's pages still answer.
   </Step>
   <Step title="Initialize it">
     ```bash

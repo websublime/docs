@@ -22,7 +22,7 @@ trunks register --name files \
 - Repeat `--arg` once per argument, in order. Repeat `--env NAME=value` once per variable.
 - The process runs on the machine (or in the container) where Trunks runs, as the Trunks user. It gets the Trunks environment plus the variables you pass with `--env`.
 - When the session ends, Trunks terminates the process and everything it started.
-- What the process writes to stderr appears in the Trunks log. Trunks replaces the values you passed with `--env` by `[redacted]`. See [Operations](/trunks/guides/operations).
+- What the process writes to stderr appears in the Trunks log. Trunks replaces the values of 4 characters or more that you passed with `--env` by `[redacted]`; shorter values appear as they are. See [Operations](/trunks/guides/operations).
 
 <Warning>
   A stdio server runs its command on the Trunks host. Only register commands you trust. The container image without the `-stdio` suffix has no `npx` or `uvx`; use `ghcr.io/websublime/trunks:v0.1.0-rc.2-stdio` for stdio servers that need them.
@@ -103,11 +103,11 @@ Use `stateful` for servers that are slow to start or that keep state between cal
 You can do everything above from the console's **Servers** page. In enterprise mode, only administrators can.
 
 - **Register server** opens a form with the same fields as the flags: a local process (command, arguments, environment variables) or a remote server (URL, bearer token, headers), and the session mode. Trunks receives values of variables, headers and tokens once and never shows them again.
-- When a remote server asks for OAuth, the console shows **Authorization required**. **Open provider** opens the provider in a new window. Once you approve, the provider sends the browser back to Trunks and the server is registered. As with the CLI, Trunks stores nothing until then, and the request expires after 10 minutes.
+- When a remote server asks for OAuth, the console shows **Authorization required**. **Open provider** opens the provider in a new window. Once you approve, the provider sends the browser back to Trunks and the server is registered. Before the browser step, Trunks already stores the OAuth client registration and the pending request, so the exchange can finish after a restart; the server itself is registered only after you approve, and the request expires after 10 minutes.
 - For a provider without dynamic client registration, open **Authorization with your own OAuth client** in the form. It shows the redirect URI to register at the provider, `<public URL>/api/dashboard/oauth/callback`, and takes the client ID, secret and scopes.
 - A server's page has a switch for the whole server, one for each tool, prompt and resource, and **Delete**.
 
-Replacing a registered server's definition (`--force`), export and import are CLI only.
+Replacing a registered server's definition (`--force`) and export are CLI only. Load exported files with `trunks register -c` and `trunks create group -c`.
 
 ## From a file
 
@@ -128,7 +128,7 @@ Write the same definition as JSON, for version control or automation:
 trunks register -c github.json
 ```
 
-The CLI replaces every `$\{VAR\}` in a string value with that environment variable of the CLI process. A variable that isn't set is an error, so credentials never end up empty. Only the `$\{NAME\}` form is recognized. Flags you pass alongside `-c` override the file.
+The CLI replaces every `${VAR}` in a string value with that environment variable of the CLI process. A variable that isn't set is an error, so credentials never end up empty. Only the `${NAME}` form is recognized. Flags you pass alongside `-c` override the file, except `--header` and `--env`: they are added to the file's entries, and the flag wins for a name that is in both.
 
 | Field | For | Meaning |
 |---|---|---|
@@ -185,7 +185,7 @@ This writes `backup/servers/<name>.json` and `backup/groups/<name>.json`, in the
 
 The export leaves out:
 
-- OAuth client registrations and tokens. You have to authorize a server registered with OAuth again where you import it.
+- OAuth client registrations and tokens. You have to authorize a server registered with OAuth again where you load the file with `trunks register -c`.
 - Which entries are disabled.
 - Users, teams, grants and MCP clients.
 

@@ -110,7 +110,7 @@ The CLI and console use these routes under `/api/v0`:
 | `GET` | `/tool-groups` | List groups. |
 | `POST` | `/tool-groups` | Create a group. Returns the group and `streamable_http_endpoint`. |
 | `GET` | `/tool-groups/{name}` | Get a group and its endpoint. |
-| `PUT` | `/tool-groups/{name}` | Replace a group's definition. Returns what changed. |
+| `PUT` | `/tool-groups/{name}` | Replace a group's definition. Returns `{"name","old","new"}`: the previous and the new definition. |
 | `DELETE` | `/tool-groups/{name}` | Delete a group. |
 | `GET` | `/tool-groups/{name}/effective-tools` | List the group's effective tools. |
 

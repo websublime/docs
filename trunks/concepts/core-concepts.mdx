@@ -58,7 +58,7 @@ All clients of the gateway share a stateful connection.
 
 ## Enabled and disabled
 
-You can disable servers, tools, prompts and resources without removing them. A disabled entry is neither listed nor callable.
+You can disable servers, tools, prompts and resources without removing them. MCP clients don't see a disabled entry and can't call it. The CLI, the REST API and the web console still list it, marked as disabled.
 
 Disabling a server hides everything it provides. When you enable it again, each tool returns to its own previous state.
 

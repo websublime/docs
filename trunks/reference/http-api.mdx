@@ -54,7 +54,7 @@ Errors are JSON: `{"error": "<message>"}`, sometimes with a machine-readable `"c
 | 404 | Not found, **or outside the caller's reach**. The two are indistinguishable on purpose. |
 | 413 | Body larger than 4 MiB. |
 | 500 | Failure reaching an upstream, or an internal error. The message carries the reason. |
-| 504 | The request, or an upstream, exceeded `TRUNKS_REQUEST_TIMEOUT_SEC` (`{"error":"request timed out"}`). |
+| 504 | The request exceeded `TRUNKS_REQUEST_TIMEOUT_SEC` (`{"error":"request timed out"}`), or an upstream did not answer within it (`{"error":"upstream '<server>' did not answer within <n>s (TRUNKS_REQUEST_TIMEOUT_SEC)"}`). |
 
 ## Service endpoints
 
@@ -73,7 +73,7 @@ Any `GET` or `HEAD` outside the paths on this page serves a page or a file of th
 
 - Pages are sent with a strict `Content-Security-Policy`: no inline script or style, no framing.
 - An unknown page answers 404 with the console's "page not found" page.
-- An unknown path under `/api`, `/auth`, `/mcp` or `/v0` answers 404 with no body.
+- An unknown path under `/api`, `/auth`, `/mcp`, `/v0`, `/health`, `/metadata`, `/metrics` or `/init` answers 404 with no body.
 
 | Page | Shows |
 |---|---|
@@ -92,7 +92,7 @@ Any `GET` or `HEAD` outside the paths on this page serves a page or a file of th
 
 ## Browser sign-in
 
-These endpoints serve the web console. They work before initialization too: `GET /auth/config` always answers, and the others answer 403 until the server runs in enterprise mode.
+These endpoints serve the web console. They work before initialization too: `GET /auth/config` and `POST /auth/logout` always answer, and the others answer 403 until the server runs in enterprise mode.
 
 | Method | Path | Who | What it does |
 |---|---|---|---|
@@ -100,7 +100,7 @@ These endpoints serve the web console. They work before initialization too: `GET
 | `GET` | `/auth/login?return_to=` | anyone, enterprise | Redirects to the OIDC provider. 404 when single sign-on is not configured. |
 | `GET` | `/auth/callback` | anyone, enterprise | The provider's redirect target. Sets the session cookie and redirects to `return_to`. |
 | `POST` | `/auth/token` | anyone, enterprise | Takes `{"access_token"}` (a user token). Answers `{"username","role"}` and sets a session cookie. |
-| `POST` | `/auth/logout` | anyone, enterprise | Ends the session. 204. |
+| `POST` | `/auth/logout` | anyone | Ends the session, if the request carries one, and clears the cookie. 204, in every mode. |
 
 The session is an `HttpOnly`, `SameSite=Lax` cookie named `trunks_session`, valid for `TRUNKS_SESSION_TTL_HOURS`. It is `Secure` when the public URL starts with `https://`, or, without a public URL, when the request carries `X-Forwarded-Proto: https`.
 
@@ -240,7 +240,7 @@ See [Enterprise mode](/trunks/guides/enterprise-mode) for how the owner and the 
 | `GET` | `/teams` | any user, enterprise | `[{"name","description"}]`. |
 | `GET` | `/teams/{name}` | any user, enterprise | `{"name","description","members":[{"username","role"}]}`. |
 | `POST` | `/teams` | admin, enterprise | Body: `{"name","description"?}`. 201, the team with its members. |
-| `PUT` | `/teams/{name}` | admin, enterprise | Body: `{"description"}`. Answers the team. |
+| `PUT` | `/teams/{name}` | admin, enterprise | Body: `{"name","description"?}`. `name` is required but ignored; only `description` is applied. Answers the team with its members. |
 | `DELETE` | `/teams/{name}` | admin, enterprise | 204. Also deletes the team's memberships, grants and MCP clients. |
 | `POST` | `/teams/{name}/members` | admin or team maintainer, enterprise | Body: `{"username","role"?}`. `role` is `member` (default) or `maintainer`; an existing member's role is updated. Answers the team with its members. |
 | `DELETE` | `/teams/{name}/members/{username}` | admin or team maintainer, enterprise | 204. |
