@@ -298,3 +298,14 @@ Agents and humans read it before they change anything in this repository.
   - Correct technical terms flagged by `vale-spellcheck` go into the `websublime` vocabulary, one regex per line. Never reword correct content just to quiet the linter.
   - Real misspellings get fixed in the page.
 - **Why:** On PR #4, `vale-spellcheck` reported 37 findings. All of them were correct technical terms: changesets, monorepos, Hono, Vitest, glibc, musl, Streamable and similar. Mintlify's built-in vocabulary cannot be extended without a repository config.
+
+## D22: Images and design previews
+
+- **Status:** accepted (2026-11-12, issue #6)
+- **Decision:**
+  - **Location and format.** Images for a project live in `images/<slug>/`, as WebP 1600 px wide (quality 88). Source archives dropped into `knowledge/` (for example `*.zip`) are git-ignored, and only the converted images are committed. Only images a page actually uses are committed.
+  - **Light and dark.** When a design comes in both versions, the page shows the one that matches the site theme (`block dark:hidden` and `hidden dark:block`).
+  - **Designs versus the documented version.** A design that shows a version other than the documented one (D5) is published only with a `<Note>` saying it is a design and that the documented release may look different.
+  - **Design-system sheets are not published.** Component specs, patterns and tokens are internal design material (D3).
+  - **Accessibility.** Every image has alt text describing what the screen shows, and a caption.
+- **First use:** the Trunks web-console designs (version 0.4.0 in the mockups) on `trunks/overview`. They are the Overview screen after the hero, plus Servers, Register, Tools, Tool groups, MCP clients and Diagnostics in a "Web console" section. The New components, Patterns and Tokens sheets were left out.

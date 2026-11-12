@@ -21,6 +21,11 @@ tag: "RC"
   </div>
 </div>
 
+<Frame caption="Web console design (version 0.4.0): the gateway overview in enterprise mode. The v0.1.0-rc.2 console may look different.">
+  <img className="block dark:hidden" src="/images/trunks/console-overview-light.webp" alt="Trunks web console overview page in light mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, admin tiles for pending authorizations and open upstream sessions, and servers whose last connection failed" />
+  <img className="hidden dark:block" src="/images/trunks/console-overview.webp" alt="Trunks web console overview page in dark mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, admin tiles for pending authorizations and open upstream sessions, and servers whose last connection failed" />
+</Frame>
+
 Trunks is a self-hosted MCP gateway and registry written in Rust. You register your MCP servers once, and your MCP clients and agents connect to a single Streamable HTTP endpoint. One binary is both the server (`trunks start`) and the management CLI. Use it alone on your machine in development mode, or share one server with a team in enterprise mode.
 
 ## What you can do
@@ -31,6 +36,45 @@ Trunks is a self-hosted MCP gateway and registry written in Rust. You register y
 - Run in enterprise mode with users, teams, per-resource grants, MCP client tokens and single sign-on (OIDC) for people.
 - Manage everything from the CLI, the REST API under `/api/v0`, or the built-in web console.
 - Store data in SQLite or PostgreSQL, and expose Prometheus metrics at `/metrics`.
+
+## Web console
+
+<Note>
+  These images are designs of the web console. They show version 0.4.0. The console in `v0.1.0-rc.2` has the same pages, but it may not look exactly like this.
+</Note>
+
+<Tabs>
+  <Tab title="Servers">
+    <Frame caption="Upstream servers with their transport, session mode, tool count, authorization, status and last error.">
+      <img src="/images/trunks/console-servers.webp" alt="Servers page listing four upstream MCP servers with transport, session mode, tool count, authorization state, enabled status and last error" />
+    </Frame>
+  </Tab>
+  <Tab title="Register">
+    <Frame caption="Registering a remote server: URL, bearer token, headers and session mode.">
+      <img src="/images/trunks/console-register-remote-server.webp" alt="Register a server form with name, description, a choice between local process and remote server, URL, optional bearer token, headers and session mode, with a validation error on the URL field" />
+    </Frame>
+  </Tab>
+  <Tab title="Tools">
+    <Frame caption="Every tool the gateway exposes, by upstream server, with its input parameters.">
+      <img src="/images/trunks/console-tools.webp" alt="Tools page listing tools by upstream server, with one tool expanded to show its input parameters, and an enable toggle per tool" />
+    </Frame>
+  </Tab>
+  <Tab title="Tool groups">
+    <Frame caption="Tool groups: curated sets of tools, each with its own endpoint.">
+      <img src="/images/trunks/console-tool-groups.webp" alt="Tool groups page listing three groups with their servers, included, excluded and effective tool counts, and endpoint URL" />
+    </Frame>
+  </Tab>
+  <Tab title="MCP clients">
+    <Frame caption="MCP clients that connect with an access token, their owners and allowed servers.">
+      <img src="/images/trunks/console-mcp-clients.webp" alt="MCP clients page listing three clients with owner and allowed servers, and a menu to rotate a token or delete a client" />
+    </Frame>
+  </Tab>
+  <Tab title="Diagnostics">
+    <Frame caption="Diagnostics: configuration, time limits, unreachable servers and pending authorizations.">
+      <img src="/images/trunks/console-diagnostics.webp" alt="Diagnostics page showing database backend, listen address and allowed hosts, time limits, unreachable servers and pending authorizations" />
+    </Frame>
+  </Tab>
+</Tabs>
 
 ## Install
 
