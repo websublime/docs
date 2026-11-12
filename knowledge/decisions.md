@@ -72,6 +72,13 @@ Agents and humans read it before they change anything in this repository.
   | delta, workspace-tools | latest release | — |
 
 - The live ref of each project is stored in `sync/registry.yaml`. The values above are a snapshot from the day of the decision.
+- **Amendment (2026-11-12, issue #3):** the refs were checked against the registries and releases before the Overview pages were written. They were:
+  - vite-open-api-server: `@websublime/vite-plugin-open-api-server@0.23.3` (npm `latest`), not 0.23.1. The 0.23.1 figure came from the `next` branch's changelog.
+  - workspace-tools: `sublime_cli_tools-v0.0.37` (crates.io and the latest GitHub release), not 0.0.36.
+  - delta: `@websublime/delta@0.2.0`.
+  - trunks: `v0.1.0-rc.2`.
+  - unblock: `v1.0.2`.
+  - focus: `origin/main`.
 - **Why:** Readers install releases. Documenting unreleased behaviour sends them after features they cannot use.
 
 ## D6: Source inconsistencies are recorded, not fixed
@@ -261,3 +268,22 @@ Agents and humans read it before they change anything in this repository.
   - `mint broken-links` passed in CI and locally.
   - Only the Mintlify app can re-run its checks: Redeploy in the dashboard rebuilt the preview but did not re-run the check.
 - **Follow-up:** reported through `mint feedback` on 2026-11-12. Drop this exception if Mintlify fixes the behaviour.
+
+## D20: Site foundation choices
+
+- **Status:** accepted (2026-11-12, issue #3)
+- **Decision:**
+  1. **Overview pages.** Every project gets a minimal Overview page now, at `<slug>/overview`, written from its sources at the D5 ref. The page covers identity, install, a quick example when verified, status for RC and WIP projects, and links. This means every `navigation.products` entry exists from the start. Fuller pages arrive with each project's sync intent.
+  2. **Featured project:** the hub features **trunks**.
+  3. **Logo:** the `websublime` wordmark (`logo/websublime-black.svg` and `logo/websublime-white.svg`, from `websublime-site/design/Logo/`). The favicon is the `ws` mark (`logo/ws-black.svg` and `logo/ws-white.svg`).
+  4. **Stats:** heroes and cards show static data for now: version, license and stack. Stars and downloads come with the sync tooling.
+  5. **Generated assets:** `scripts/line-ui.mjs` copies the pinned stylesheets (`scripts/line-ui.versions.json`) into `styles/line-*.css` and writes `docs.json` `colors`/`background` from the sand scale:
+     - `primary` = sand-12 light;
+     - `light` = sand-12 dark;
+     - `dark` = sand-11 light, which is visible as a button colour in both modes;
+     - backgrounds = sand-1.
+
+     CI runs `--check`. This settles the `colors.dark` choice that D9 left open.
+  6. **Custom markup:** classes use the `ws-` prefix and live in `styles/site.css`. Wrappers carry `not-prose`, so Mintlify typography leaves them alone. Status badges use the warning role for WIP and the info role for RC (D8).
+  7. **Product order:** the Hub first, then the projects in alphabetical order.
+- **Why:** Miguel's choices on issue #3.

@@ -1,122 +1,159 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "websublime",
+  "description": "Documentation for websublime's open-source projects.",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#21201c",
+    "light": "#eeeeec",
+    "dark": "#63635e"
   },
-  "favicon": "/favicon.svg",
+  "background": {
+    "color": {
+      "light": "#fdfdfc",
+      "dark": "#111110"
+    }
+  },
+  "logo": {
+    "light": "/logo/websublime-black.svg",
+    "dark": "/logo/websublime-white.svg",
+    "href": "/"
+  },
+  "favicon": {
+    "light": "/logo/ws-black.svg",
+    "dark": "/logo/ws-white.svg"
+  },
   "navigation": {
-    "tabs": [
+    "products": [
       {
-        "tab": "Guides",
+        "product": "Hub",
+        "description": "All websublime projects",
+        "icon": "house",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "websublime",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "index"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "product": "delta",
+        "description": "Typed JSON model diffing for TypeScript",
+        "icon": "code-compare",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Get started",
             "pages": [
-              "api-reference/introduction"
+              "delta/overview"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "product": "focus",
+        "description": "WIP · Rust engine for AI-DLC workflows",
+        "icon": "bullseye",
+        "groups": [
           {
-            "group": "Endpoint examples",
+            "group": "Get started",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "focus/overview"
+            ]
+          }
+        ]
+      },
+      {
+        "product": "line-ui",
+        "description": "WIP · Headless UI primitives as Web Components",
+        "icon": "shapes",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "line-ui/overview"
+            ]
+          }
+        ]
+      },
+      {
+        "product": "trunks",
+        "description": "RC · Self-hosted MCP gateway and registry",
+        "icon": "network-wired",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "trunks/overview"
+            ]
+          }
+        ]
+      },
+      {
+        "product": "unblock",
+        "description": "WIP · Agent-first, MCP-first issue tracker",
+        "icon": "list-check",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "unblock/overview"
+            ]
+          }
+        ]
+      },
+      {
+        "product": "vite-open-api-server",
+        "description": "Local OpenAPI mock server for Vite",
+        "icon": "server",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "vite-open-api-server/overview"
+            ]
+          }
+        ]
+      },
+      {
+        "product": "workspace-tools",
+        "description": "Changeset-based versioning for JS/TS repositories",
+        "icon": "boxes-stacked",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "workspace-tools/overview"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    ]
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "GitHub",
+        "href": "https://github.com/websublime"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/websublime"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   }
 }

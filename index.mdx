@@ -1,97 +1,88 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Open-source projects"
+sidebarTitle: "Hub"
+description: "Documentation for websublime's open-source projects, written from each project's latest release."
+mode: "wide"
 ---
 
-## Setting up
+<div className="not-prose ws-hero" data-accent="sand">
+  <div className="ws-hero-head">
+    <p className="ws-hero-tagline">Every websublime project in one place. Each page is written from the project's own sources at its latest release.</p>
+  </div>
+  <div className="ws-actions">
+    <a className="ws-button ws-button-ink" href="https://github.com/websublime">websublime on GitHub</a>
+    <a className="ws-button" href="#projects">Browse projects</a>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+<h2 className="not-prose ws-section-title">Featured project</h2>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+<a className="not-prose ws-card ws-featured" data-accent="teal" href="/trunks/overview">
+  <div>
+    <div className="ws-card-head">
+      <span className="ws-swatch"></span>
+      <p className="ws-card-name">Trunks</p>
+      <span className="ws-badge ws-badge-rc">RC</span>
+    </div>
+    <p className="ws-card-text">Run all your MCP servers behind one endpoint. A self-hosted MCP gateway and registry with tool groups, access control and single sign-on.</p>
+    <div className="ws-card-meta"><span>0.1.0-rc.2</span><span>MPL-2.0</span><span>Rust · MCP</span></div>
+  </div>
+  <span className="ws-button ws-button-solid">Read the overview</span>
+</a>
 
-## Make it yours
+<h2 className="not-prose ws-section-title" id="projects">Projects</h2>
 
-Design a docs site that looks great and empowers your users.
+<div className="not-prose ws-grid">
+  <a className="ws-card" data-accent="indigo" href="/delta/overview">
+    <div className="ws-card-head"><span className="ws-swatch"></span><p className="ws-card-name">delta://</p></div>
+    <p className="ws-card-text">Diff any two JSON values into typed operations, then patch, reverse or export them.</p>
+    <div className="ws-card-meta"><span>0.2.0</span><span>MIT</span><span>TypeScript · ESM</span></div>
+  </a>
+  <a className="ws-card" data-accent="crimson" href="/focus/overview">
+    <div className="ws-card-head"><span className="ws-swatch"></span><p className="ws-card-name">Focus</p><span className="ws-badge ws-badge-wip">WIP</span></div>
+    <p className="ws-card-text">A Rust engine that turns your AI coding assistant into a gated, audited delivery workflow.</p>
+    <div className="ws-card-meta"><span>0.1.0 (unreleased)</span><span>MIT</span><span>Rust · AI-DLC</span></div>
+  </a>
+  <a className="ws-card" data-accent="lime" href="/line-ui/overview">
+    <div className="ws-card-head"><span className="ws-swatch"></span><p className="ws-card-name">line://ui</p><span className="ws-badge ws-badge-wip">WIP</span></div>
+    <p className="ws-card-text">Headless UI primitives as native Web Components, for any framework or plain HTML.</p>
+    <div className="ws-card-meta"><span>components 0.2.4</span><span>MIT</span><span>Web Components · Lit · Zag.js</span></div>
+  </a>
+  <a className="ws-card" data-accent="teal" href="/trunks/overview">
+    <div className="ws-card-head"><span className="ws-swatch"></span><p className="ws-card-name">Trunks</p><span className="ws-badge ws-badge-rc">RC</span></div>
+    <p className="ws-card-text">Run all your MCP servers behind one endpoint.</p>
+    <div className="ws-card-meta"><span>0.1.0-rc.2</span><span>MPL-2.0</span><span>Rust · MCP</span></div>
+  </a>
+  <a className="ws-card" data-accent="orange" href="/unblock/overview">
+    <div className="ws-card-head"><span className="ws-swatch"></span><p className="ws-card-name">unblock</p><span className="ws-badge ws-badge-wip">WIP</span></div>
+    <p className="ws-card-text">Agent-first issue tracker: a local, dependency-aware issue store your agents drive over MCP.</p>
+    <div className="ws-card-meta"><span>1.0.2</span><span>MIT OR Apache-2.0</span><span>Rust · MCP · SQLite</span></div>
+  </a>
+  <a className="ws-card" data-accent="purple" href="/vite-open-api-server/overview">
+    <div className="ws-card-head"><span className="ws-swatch"></span><p className="ws-card-name">vite-open-api-server</p></div>
+    <p className="ws-card-text">A local OpenAPI mock server inside your Vite dev server.</p>
+    <div className="ws-card-meta"><span>0.23.3</span><span>MIT</span><span>TypeScript · Vite · Hono</span></div>
+  </a>
+  <a className="ws-card" data-accent="cyan" href="/workspace-tools/overview">
+    <div className="ws-card-head"><span className="ws-swatch"></span><p className="ws-card-name">workspace-tools</p></div>
+    <p className="ws-card-text">Changesets, version bumps, upgrades and audits for JS/TS monorepos, in one Rust CLI.</p>
+    <div className="ws-card-meta"><span>0.0.37 (CLI)</span><span>MIT</span><span>Rust · Node bindings</span></div>
+  </a>
+</div>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+<h2 className="not-prose ws-section-title">Guidelines and resources</h2>
 
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<div className="not-prose ws-grid">
+  <a className="ws-card" data-accent="sand" href="https://github.com/websublime/docs/blob/main/CONTRIBUTING.md">
+    <p className="ws-card-name">Contribute to these docs</p>
+    <p className="ws-card-text">Open an intent, then a pull request. CI must be green before review.</p>
+  </a>
+  <a className="ws-card" data-accent="sand" href="https://github.com/websublime/docs/issues/new/choose">
+    <p className="ws-card-name">Report a docs problem</p>
+    <p className="ws-card-text">Found something wrong or missing? Open an issue on the docs repository.</p>
+  </a>
+  <a className="ws-card" data-accent="sand" href="https://github.com/websublime">
+    <p className="ws-card-name">Source code</p>
+    <p className="ws-card-text">Every project lives under the websublime organization on GitHub.</p>
+  </a>
+</div>
