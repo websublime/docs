@@ -1,0 +1,263 @@
+# Decisions log
+
+This file records every decision that shapes the websublime documentation hub. Each decision has a D-id and the reason behind it.
+Agents and humans read it before they change anything in this repository.
+
+## Rules for this log
+
+- **New decision.** A new decision gets the next D-id. Add it in the same pull request as the change it allows.
+- **Amendment.** A refinement of an existing decision is an amendment on that decision's own entry. Date it, and do not give it a new D-id.
+- **Superseding.** A new decision that replaces an older one gets a new D-id and cross-references in both entries: "Supersedes Dnn" and "Superseded by Dnn". Never overwrite an entry without a trace.
+- **Status values.** `accepted` (in force), `superseded`, `proposed` (needs Miguel's confirmation before anyone acts on it).
+- **Source.** Every entry says where the decision was taken: a conversation, an issue or a pull request.
+
+---
+
+## D1: One Mintlify project hosts every project
+
+- **Status:** accepted (2026-11-12, conversation, issue #1)
+- **Decision:**
+  - The websublime open-source projects share one Mintlify project, granted through the Mintlify OSS Program (Pro plan).
+  - All published content lives in this repository (`websublime/docs`).
+  - The site does not use Mintlify multi-repo projects (Enterprise only) or `mintlify/multirepo-action`.
+- **Why:** The OSS grant covers one project. Miguel chose to stay inside what the grant offers.
+- **Consequences:**
+  - Project repositories never hold the site's pages.
+  - This repository reproduces their content (D2).
+  - Adding a project means adding it here (D17).
+
+## D2: Content is produced by reading each project's sources
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:** Pages are written from each project's documentation, READMEs and code, at the ref chosen by D5. Content comes in three kinds:
+  - **Generated:** a deterministic script reads a structured artifact and writes the page. Examples: the clap-generated CLI reference, MCP contract snapshots, `custom-elements.json`, `.d.ts` files, stage frontmatter, `CHANGELOG.md` files.
+  - **Adapted:** an agent rewrites prose such as overviews, quickstarts, concepts and guides, under the rules in D3.
+  - **Linked:** content that is better served elsewhere, such as Storybook, docs.rs and GitHub Releases.
+- **Code is the source of truth.** When a README contradicts the code, the page describes what the code does. The contradiction goes into the project's report (D6).
+- **Why:** The inventory in `knowledge/projects/` found README-versus-code contradictions in every project. A plain copy of the prose would publish them.
+
+## D3: Internal material is never published
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:** The following are never copied, quoted or linked on the site:
+  - PRDs, plans, specs, spikes, context files and research notes.
+  - Agent files (`CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.knowledge/`, `.beads/`).
+  - `temp/`.
+  - Portuguese design documents.
+  - Internal identifiers such as `FR-20`, `D35`, `NFR-12` and `spine §5`, and links into `docs/plans`, `history/` and similar folders.
+- Each project's entry in `sync/registry.yaml` lists its exclusions. The inventories in `knowledge/projects/*.md` (section 3) classify every file as PUBLIC-READY, INTERNAL or MIXED.
+- A lint step that fails CI when this material shows up is part of the sync tooling.
+- **Why:**
+  - Several repositories keep internal design work next to public docs (`trunks/docs/0X-*.md`, `unblock/docs/PRD.md`, `line-ui/docs/context/`).
+  - `unblock/temp/` holds a secrets file, which is gitignored but still present on disk.
+
+## D4: The site is in English
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:** Every published page is in English. Portuguese sources are translated, never published as they are. This knowledge base is also in English.
+- **Why:** The projects' READMEs and public guides are in English.
+
+## D5: Which version is documented
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:** Each project is documented at its **latest stable release**, with these exceptions:
+
+  | Project | Ref documented | Why |
+  |---|---|---|
+  | trunks | latest release-candidate tag (`v0.1.0-rc.2` at decision time) | only release candidates exist |
+  | focus | `main` | no release or tag exists |
+  | line-ui | the versions published on npm | many more components exist, but their release is blocked. Update the docs when they are released |
+  | unblock | latest release tag (`v1.0.2` at decision time) | `main` holds unreleased v1.1 features |
+  | vite-open-api-server | latest stable release (`0.23.1`, branch `main`) | the `next` branch (v1 multi-spec) is prerelease |
+  | delta, workspace-tools | latest release | — |
+
+- The live ref of each project is stored in `sync/registry.yaml`. The values above are a snapshot from the day of the decision.
+- **Why:** Readers install releases. Documenting unreleased behaviour sends them after features they cannot use.
+
+## D6: Source inconsistencies are recorded, not fixed
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:**
+  - Every contradiction found while reading a project (README versus code, stale versions, wrong names) is recorded in `sync/reports/<slug>.md`.
+  - The docs repository does not change project repositories and does not open issues on them.
+- **Why:** This repository's job is to document. Fixing the projects is Miguel's decision, project by project.
+- The first set of inconsistencies is in `knowledge/projects/*.md` (section 7).
+
+## D7: The sync runs locally, driven by a manifest
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:**
+  - An agent command in this repository runs the sync against local checkouts under `../<project>`. A CI runner and Mintlify Autopilot were considered and not chosen as the primary path.
+  - `sync/registry.yaml` holds, for each project:
+    - repository, local path and ref (D5);
+    - `lastSynced` commit;
+    - status badge (D8) and accent (D10);
+    - exclusions (D3);
+    - the page-to-source map and the generators.
+  - **Flow:**
+    1. Run `git diff lastSynced..ref` on the watched paths.
+    2. Map the changed files to the pages they affect.
+    3. Regenerate the generated pages and adapt the affected prose.
+    4. Validate.
+    5. Open a pull request, following D15.
+    6. Update `lastSynced`.
+- **Why:**
+  - Every repository is already checked out next to this one, including WIP branches.
+  - Autopilot costs 250 credits per pull request it opens on its own (10,000 credits a month on Pro).
+  - Autopilot cannot follow the exclusions or the page map.
+
+## D8: Status badges
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:**
+
+  | Project | Badge |
+  |---|---|
+  | trunks | RC |
+  | unblock, line-ui, focus | WIP |
+  | delta, vite-open-api-server, workspace-tools | none (stable) |
+
+- The badge appears in the page frontmatter `tag`, the project hero, the hub card and the product description. Mintlify products have no `tag` field, so the badge cannot go on the product itself.
+- unblock is WIP by Miguel's call, although its README says GA 1.0.0.
+
+## D9: Visual foundation is the line://ui design system with the websublime brand
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:**
+  - The site uses `@websublime/line-tokens`, `@websublime/line-colors` and `@websublime/line-themes`.
+  - The websublime brand (logos in `../websublime-site/design/Logo/`, ink `#242320`) maps onto the line `sand` scale. `sand-12` is `#21201c`, practically the same as the brand ink.
+  - **Site chrome colours** (`docs.json` accepts hex only):
+
+    | Setting | Value | Source |
+    |---|---|---|
+    | `colors.primary` | `#21201c` | sand-12, light |
+    | `colors.light` | `#eeeeec` | sand-12, dark |
+    | background, light | `#fdfdfc` | sand-1 |
+    | background, dark | `#111110` | sand-1 |
+
+  - `colors.dark` (used for buttons in both modes) is chosen while building the site, after checking it in both modes.
+  - **Fonts:** the line tokens `--line-font-sans` and `--line-font-mono`, which are system font stacks.
+- **Why:** Miguel asked to use the design system line://ui offers. The brand fits it without a custom palette.
+
+## D10: Accent colour of each project
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:** Each project section uses one line hue as its accent, through `data-accent`. The green, amber, red and blue hues are kept for the success, warning, danger and info roles and are never used as a project accent.
+
+  | Project | Hue | Step 9 | Auto-paired gray | Reason |
+  |---|---|---|---|---|
+  | hub (websublime) | sand | `#21201c` (sand-12) | sand | brand ink |
+  | trunks | teal | `#12a594` | sage | matches its favicon gradient |
+  | line-ui | lime | `#bdee63` | olive | closest to its brand `#c8ff00`, which is off the scale |
+  | unblock | orange | `#f76b15` | sand | its palette is orange (`#b95f14`, off the scale); amber is reserved for warnings |
+  | delta | indigo | `#3e63dd` | slate | neutral and technical; avoids the red and green of diffs |
+  | vite-open-api-server | purple | `#8e4ec6` | mauve | Vite's purple |
+  | workspace-tools | cyan | `#00a2c7` | slate | its CLI already uses cyan (`crates/cli/src/cli/branding.rs`) |
+  | focus | crimson | `#e93d82` | mauve | no brand of its own |
+
+- Cyan (workspace-tools) and teal (trunks) sit close together. Plum (`#ab4aba`) is the agreed fallback for workspace-tools if the two read as the same colour.
+
+## D11: How line://ui is wired into Mintlify
+
+- **Status:** accepted (2026-11-12, spike with `mint dev` 4.3.19; see `knowledge/research/line-ui-design-system.md`)
+- **Decision:**
+  1. **CSS is copied into the repository** from the pinned published versions, as `styles/line-{tokens,colors,themes}.css`. The spike showed `packages.css` not loading in `mint dev`, while any `.css` file in the content directory loads.
+  2. **Colour scheme:** a site stylesheet sets `html { color-scheme: light }` and `html.dark { color-scheme: dark }`. line colours use `light-dark()`, which follows `color-scheme`.
+  3. **Accent scope:** every custom component declares `data-accent` (and `data-gray` when needed). Without it, line falls back to indigo (`html:not([data-accent])`).
+  4. **Class names:** never use class names that start with `line-` on markup that is not a line component. The line reset targets those classes, and the `line` cascade layer comes after Mintlify's layers, so it wins any conflict.
+  5. **Chrome colours** in `docs.json` are generated from `line-colors` by a script, so they cannot drift from the scale.
+  6. **Server rendering:** static parts (hero, cards) are plain HTML in MDX with `data-accent`, so they reach the server-rendered HTML. JSX snippets are for interactive parts only, because they render in the browser.
+  7. **line components:** published components (today `button`, `separator`, `stack`) may be used through Mintlify `packages` (`package.json` plus an npm or pnpm lockfile; Bun lockfiles are not supported). They render in the browser only.
+- **Why:** Verified behaviour of Mintlify and line://ui together (see the research note).
+
+## D12: Navigation and layout
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:**
+  - **Navigation:** `navigation.products` has one product for the hub and one per project. Inside a project, groups follow the project's page tree (`knowledge/projects/<slug>.md`, section 5).
+  - **Hub** (`index`, `mode: wide`) contains:
+    - a websublime hero;
+    - project cards with accent, status badge, stack and version;
+    - a featured project;
+    - "Guidelines & Resources".
+  - **Project overview** (default mode) contains:
+    - a hero with badge, stats and buttons for GitHub and installing;
+    - the right rail through `<Panel>`, holding "Install" and "Contribute" (`<Steps>`, `<Tip>`). `<Panel>` only shows in the default mode.
+  - **All other pages** use the standard documentation layout.
+- **Why:**
+  - The reference is the portal layout Miguel shared: sidebar, hero with stats, cards and a right "contribute" rail.
+  - The portal style helps when browsing projects but gets in the way of reading reference pages.
+
+## D13: line-ui keeps its own Storybook and site
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:**
+  - The line-ui section links to Storybook (`https://line-ui-storybook.websublime.com`) and to the site (`https://line-ui.websublime.com`). It does not replace them.
+  - Live component demos stay in Storybook.
+
+## D14: Domain
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:** The site is served at `docs.websublime.com`.
+
+## D15: Delivery process
+
+- **Status:** accepted (2026-11-12, conversation, issue #1)
+- **Decision:** Every change follows **intent → decide → implement (PR) → test/review → release (merge)**, as described in `knowledge/process.md`.
+  - CI gates every step. When CI fails, work stops until it is fixed. Nobody moves past a red check by skipping, disabling or weakening it.
+  - Agents never merge. Release (merge) needs Miguel's explicit approval.
+- **Why:** Miguel asked for a fixed process that always follows CI and never moves on after a failure.
+
+## D16: The knowledge base lives in `knowledge/`
+
+- **Status:** accepted (2026-11-12, conversation, issue #1)
+- **Decision:**
+  - `knowledge/` holds this log, the process, research notes and project inventories. `.mintignore` keeps it off the published site.
+  - Every pull request that makes or changes a decision updates this log in the same pull request.
+- **Why:** Later iterations, by any agent or human, must not lose context that so far existed only in conversations.
+
+## D17: Adding a new project
+
+- **Status:** accepted (2026-11-12, conversation)
+- **Decision:** A new project goes through the same steps as the first seven:
+  1. An inventory, following the template in `knowledge/projects/README.md`.
+  2. A `sync/registry.yaml` entry (ref per D5, badge per D8, accent per D10, exclusions per D3).
+  3. Its pages.
+  4. A hub card.
+  5. A `navigation.products` entry.
+
+  Each step goes through D15.
+- **Why:** Miguel asked that every new project be added and kept up to date.
+
+## D18: Mintlify App checks count only when Mintlify deployed the commit
+
+- **Status:** accepted (2026-11-12, conversation, PR #2). Amends the gate in D15.
+- **Decision:**
+  - When `Mintlify Deployment` ran for the head commit, all of the Mintlify GitHub App's validation checks (`link-rot`, `vale-spellcheck`) must be green.
+  - When `Mintlify Deployment` is **skipped**, the app's validation checks do not gate the pull request. The gate is the `CI` workflow (`mint validate`, `mint broken-links`). Deployment is skipped when a commit touches only paths excluded by `.mintignore`, such as `knowledge/`.
+  - A failed or cancelled deployment is never skipped. It blocks the pull request.
+- **Why:**
+  - On PR #2, the commit `80b2c97` changed published pages, and the deployment and every check passed.
+  - The commit `a3daeef` changed only `knowledge/`. Its deployment was skipped, and `link-rot` and `vale-spellcheck` failed with "An unknown error occurred". The Mintlify dashboard shows no preview for that commit.
+  - Only the app can re-run its checks: GitHub's rerequest API returns 404 for us, and Redeploy in the Mintlify dashboard rebuilds the preview, not the checks.
+  - Without this rule, every pull request that only changes the knowledge base would stay blocked.
+- **Follow-up:** reported to Mintlify through `mint feedback` on 2026-11-12. Drop this exception if Mintlify fixes the behaviour.
+- **Amendment (2026-11-12, PR #2):** commit `4398aca` also touched only `.mintignore` paths and its deployment was skipped, but `link-rot` and `vale-spellcheck` both passed. The failure is therefore intermittent, not caused by every ignored-only commit. The rule stays as it is; only this rationale is corrected.
+
+## D19: An internal error in a Mintlify App check does not block when the equivalent CI check passes
+
+- **Status:** accepted (2026-11-12, conversation, PR #2). Amends the gate in D15, alongside D18.
+- **Decision:** A Mintlify GitHub App check does not block a pull request when all of these hold:
+  1. Its conclusion is `failure` with the summary "An unknown error occurred".
+  2. Its own output shows no finding.
+  3. The equivalent check in our `CI` workflow passed on the same commit. `link-rot` maps to `mint broken-links`; `vale-spellcheck` has no CI equivalent, so this rule never covers it.
+- Every time this rule is used, record in the pull request:
+  - the check-run id;
+  - the line of its output that shows no finding;
+  - the `mint feedback` report sent to Mintlify.
+- A Mintlify check that reports actual findings always blocks.
+- **Why:**
+  - On commit `8dacf0b`, `link-rot` (check run 131275741168) failed with "An unknown error occurred", while its output said "Checked for broken links and found none in 276.91ms".
+  - `mint broken-links` passed in CI and locally.
+  - Only the Mintlify app can re-run its checks: Redeploy in the dashboard rebuilt the preview but did not re-run the check.
+- **Follow-up:** reported through `mint feedback` on 2026-11-12. Drop this exception if Mintlify fixes the behaviour.
