@@ -85,7 +85,7 @@ claude mcp add --transport http trunks http://127.0.0.1:8080/mcp
 
 - `v0.1.0-rc.1` has container images but no binaries, because its release build failed. Use `v0.1.0-rc.2`.
 - No final release exists yet, so the `latest` installer links and the `latest` and `latest-stdio` image tags do not resolve to this version.
-- Trunks is not published on crates.io. Install from GitHub Releases, from source or from a container image.
+- Trunks is not published on crates.io. The `trunks` crate there is an unrelated project, so `cargo install trunks` installs the wrong tool. Install from GitHub Releases, from source (`cargo install --git`) or from a container image.
 - OIDC for MCP clients, organisations and declarative configuration are not part of this release.
 
 ## Links

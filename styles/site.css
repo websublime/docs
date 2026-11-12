@@ -21,7 +21,6 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
   background: linear-gradient(135deg, var(--line-accent-a3), var(--line-gray-a2) 60%);
   color: var(--line-gray-text);
 }
-.ws-hero-title { margin: 0; font-size: 1.75rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
 .ws-hero-tagline { margin: 0; max-width: 46rem; font-size: 1.05rem; line-height: 1.55; color: var(--line-gray-text-low); }
 .ws-hero-head { display: grid; gap: 0.5rem; justify-items: start; }
 
@@ -39,7 +38,6 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
 }
 .ws-badge-wip { background: var(--line-warning-solid); color: var(--line-warning-contrast); }
 .ws-badge-rc { background: var(--line-info-solid); color: var(--line-info-contrast); }
-.ws-badge-accent { background: var(--line-accent-bg); color: var(--line-accent-text-low); }
 
 /* Static stats (version, license, stack) */
 .ws-stats { display: flex; flex-wrap: wrap; gap: 0.75rem 2rem; margin: 0; }

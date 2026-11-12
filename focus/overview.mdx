@@ -62,9 +62,9 @@ focus engine graph scope bugfix
 
 ## Status
 
-- **Works:** the stage graph, the audit ledger, the runtime graph, the workflow state file with its transitions, gates and jumps, creating a piece of work, settings files, and 11 harness hooks.
+- **Works:** the stage graph, the audit ledger, the runtime graph, the workflow state file with its transitions, gates and jumps, creating a piece of work, settings files, and 12 harness hooks plus the `guard-tool-call` group.
 - **Not yet:** the orchestrator. Checks that depend on it are refused by name.
-- **Refused as not ported:** 30 `utility` verbs (for example `doctor`, `init`, `intent`, `space`), `jump reopen`, and 5 hooks: `guard-tool-call`, `plan-approval-guard`, `continue-workflow`, `deliver-stage-rules` and `fold-usage`.
+- **Refused as not ported:** 30 `utility` verbs (for example `doctor`, `init`, `intent`, `space`), `jump reopen`, and 3 hooks: `continue-workflow`, `deliver-stage-rules` and `fold-usage`.
 - **Not available:** published binaries, installers and a harness installer. Adapters for Cursor and GitHub Copilot do not exist yet, so in practice only Claude Code hooks work.
 - `graph resolve` runs only when `FOCUS_GRAPH_RESOLVE=1` is set.
 
