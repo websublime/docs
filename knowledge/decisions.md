@@ -242,6 +242,7 @@ Agents and humans read it before they change anything in this repository.
   - Only the app can re-run its checks: GitHub's rerequest API returns 404 for us, and Redeploy in the Mintlify dashboard rebuilds the preview, not the checks.
   - Without this rule, every pull request that only changes the knowledge base would stay blocked.
 - **Follow-up:** reported to Mintlify through `mint feedback` on 2026-11-12. Drop this exception if Mintlify fixes the behaviour.
+- **Amendment (2026-11-12, PR #2):** commit `4398aca` also touched only `.mintignore` paths and its deployment was skipped, but `link-rot` and `vale-spellcheck` both passed. The failure is therefore intermittent, not caused by every ignored-only commit. The rule stays as it is; only this rationale is corrected.
 
 ## D19: An internal error in a Mintlify App check does not block when the equivalent CI check passes
 

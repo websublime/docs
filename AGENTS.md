@@ -18,7 +18,7 @@ Projects documented: delta, trunks, vite-open-api-server, unblock, workspace-too
 ## Hard rules
 
 - **Process (D15).** intent (GitHub issue) → decide (Miguel confirms; record D-ids) → implement (branch + PR) → test/review → release (merge).
-- **CI is the gate** (with the D18 exception for skipped Mintlify deployments).
+- **CI is the gate** (with the D18 and D19 exceptions for Mintlify App checks).
   - When a check fails, stop, fix the cause in the same PR, and wait for green.
   - Never skip, disable or weaken a check, and never move on to other work while CI is red.
   - If you cannot fix the failure, stop and report it with the log.
