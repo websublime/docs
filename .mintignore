@@ -5,3 +5,8 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# Knowledge base and agent contracts (D16)
+knowledge/
+AGENTS.md
+CLAUDE.md
