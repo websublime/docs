@@ -21,9 +21,9 @@ tag: "RC"
   </div>
 </div>
 
-<Frame caption="Web console design: the gateway overview in enterprise mode.">
-  <img className="block dark:hidden" src="/images/trunks/console-overview-light.webp" alt="Trunks web console overview page in light mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, and servers whose last connection failed" />
-  <img className="hidden dark:block" src="/images/trunks/console-overview.webp" alt="Trunks web console overview page in dark mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, and servers whose last connection failed" />
+<Frame caption="Web console design (version 0.4.0): the gateway overview in enterprise mode. The v0.1.0-rc.2 console may look different.">
+  <img className="block dark:hidden" src="/images/trunks/console-overview-light.webp" alt="Trunks web console overview page in light mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, admin tiles for pending authorizations and open upstream sessions, and servers whose last connection failed" />
+  <img className="hidden dark:block" src="/images/trunks/console-overview.webp" alt="Trunks web console overview page in dark mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, admin tiles for pending authorizations and open upstream sessions, and servers whose last connection failed" />
 </Frame>
 
 Trunks is a self-hosted MCP gateway and registry written in Rust. You register your MCP servers once, and your MCP clients and agents connect to a single Streamable HTTP endpoint. One binary is both the server (`trunks start`) and the management CLI. Use it alone on your machine in development mode, or share one server with a team in enterprise mode.
@@ -51,7 +51,7 @@ Trunks is a self-hosted MCP gateway and registry written in Rust. You register y
   </Tab>
   <Tab title="Register">
     <Frame caption="Registering a remote server: URL, bearer token, headers and session mode.">
-      <img src="/images/trunks/console-register-remote-server.webp" alt="Register a server form with name, description, a choice between local process and remote server, URL, optional bearer token, headers and session mode" />
+      <img src="/images/trunks/console-register-remote-server.webp" alt="Register a server form with name, description, a choice between local process and remote server, URL, optional bearer token, headers and session mode, with a validation error on the URL field" />
     </Frame>
   </Tab>
   <Tab title="Tools">
