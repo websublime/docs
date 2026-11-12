@@ -1,0 +1,180 @@
+---
+title: "Install Trunks"
+sidebarTitle: "Installation"
+description: "Install Trunks v0.1.0-rc.2 with the installers, a release archive, cargo, a container image or Docker Compose."
+---
+
+Trunks is one binary. `trunks start` runs the server, and every other command is the management CLI. Pick the install method that fits how you run it.
+
+| Method | Use it for |
+|---|---|
+| [Installer script](#installer-scripts) | A local install on macOS, Linux or Windows |
+| [Release archive](#release-archives) | A manual install, or a platform without the installers |
+| [Build from source](#build-from-source) | Building with your own Rust toolchain |
+| [Container image](#container-images) | Running the server in Docker or Kubernetes |
+| [Docker Compose](#docker-compose) | A ready-made local or production stack |
+
+<Warning>
+  `v0.1.0-rc.2` is a pre-release. The `releases/latest/download/…` URLs and the `latest` and `latest-stdio` image tags only follow final releases, so they do not resolve to this version. Always name the tag, as the examples on this page do.
+</Warning>
+
+## Installer scripts
+
+The installers download the release archive for your platform and place `trunks` in your Cargo home (`~/.cargo/bin` by default).
+
+<CodeGroup>
+
+```bash macOS and Linux
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/websublime/trunks/releases/download/v0.1.0-rc.2/trunks-installer.sh | sh
+```
+
+```powershell Windows
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/websublime/trunks/releases/download/v0.1.0-rc.2/trunks-installer.ps1 | iex"
+```
+
+</CodeGroup>
+
+Check the install:
+
+```bash
+trunks version
+```
+
+## Release archives
+
+The [`v0.1.0-rc.2` release](https://github.com/websublime/trunks/releases/tag/v0.1.0-rc.2) publishes one archive per target, each with a `.sha256` checksum file. A combined `sha256.sum` and the source archive (`source.tar.gz`) are attached too.
+
+| Platform | Architecture | Archive |
+|---|---|---|
+| macOS | Apple silicon | `trunks-aarch64-apple-darwin.tar.xz` |
+| macOS | Intel | `trunks-x86_64-apple-darwin.tar.xz` |
+| Linux (glibc) | arm64 | `trunks-aarch64-unknown-linux-gnu.tar.xz` |
+| Linux (glibc) | x86_64 | `trunks-x86_64-unknown-linux-gnu.tar.xz` |
+| Linux (musl, static) | arm64 | `trunks-aarch64-unknown-linux-musl.tar.xz` |
+| Linux (musl, static) | x86_64 | `trunks-x86_64-unknown-linux-musl.tar.xz` |
+| Windows | arm64 | `trunks-aarch64-pc-windows-msvc.zip` |
+| Windows | x86_64 | `trunks-x86_64-pc-windows-msvc.zip` |
+
+For example, on Linux x86_64:
+
+```bash
+base=https://github.com/websublime/trunks/releases/download/v0.1.0-rc.2
+curl -LO "$base/trunks-x86_64-unknown-linux-gnu.tar.xz"
+curl -LO "$base/trunks-x86_64-unknown-linux-gnu.tar.xz.sha256"
+sha256sum -c trunks-x86_64-unknown-linux-gnu.tar.xz.sha256
+tar -xf trunks-x86_64-unknown-linux-gnu.tar.xz
+```
+
+Move the `trunks` binary to a directory on your `PATH`.
+
+## Build from source
+
+You need Rust 1.94 or newer.
+
+```bash
+cargo install --locked --git https://github.com/websublime/trunks --tag v0.1.0-rc.2 trunks
+```
+
+<Note>
+  The web console is built separately with Node.js and embedded at compile time. A plain `cargo install` does not build it, so the server runs without the console pages. The CLI, the REST API and the MCP endpoints work as usual. The release archives and container images include the console.
+</Note>
+
+<Warning>
+  Trunks is not published on crates.io. The `trunks` crate there is an unrelated project, so `cargo install trunks` does not install this gateway.
+</Warning>
+
+## Container images
+
+Two images are published to the GitHub Container Registry for `linux/amd64` and `linux/arm64`. The tags keep the `v` of the release.
+
+| Image | Contents | Use it for |
+|---|---|---|
+| `ghcr.io/websublime/trunks:v0.1.0-rc.2` | The binary only (distroless) | Upstreams that Trunks reaches over HTTP |
+| `ghcr.io/websublime/trunks:v0.1.0-rc.2-stdio` | The binary, Node.js 24 (`npx`) and uv with Python 3.13 (`uvx`) | `stdio` upstreams distributed as npm or PyPI packages |
+
+Both images:
+
+- run as a non-root user (user ID 65532 in the distroless image, 10001 in the `-stdio` image);
+- keep their data in the `/data` volume, with `TRUNKS_DATABASE_URL` set to `sqlite:///data/trunks.db`;
+- listen on every interface (`TRUNKS_BIND_HOST=0.0.0.0`), in both modes, because the port mapping decides who can reach the server;
+- expose port `8080` and run `trunks start` by default.
+
+```bash
+docker run -d --name trunks -p 127.0.0.1:8080:8080 -v trunks-data:/data \
+  -e TRUNKS_ALLOWED_HOSTS=localhost,127.0.0.1 \
+  ghcr.io/websublime/trunks:v0.1.0-rc.2-stdio
+```
+
+<Note>
+  The distroless image has no shell and no `npx`. Registering a `stdio` upstream there fails with "failed to spawn". Use the `-stdio` image for those servers.
+</Note>
+
+Because the container listens on every interface, publish the port on `127.0.0.1` in development mode, as above. Development mode has no authentication.
+
+## Docker Compose
+
+The repository ships two compose files.
+
+<Warning>
+  Both files reference the `latest` and `latest-stdio` tags, which do not exist for this pre-release. Change the `image:` line to `ghcr.io/websublime/trunks:v0.1.0-rc.2-stdio` or `ghcr.io/websublime/trunks:v0.1.0-rc.2` before you start them.
+</Warning>
+
+<Tabs>
+  <Tab title="Development">
+    `docker-compose.yaml` is for one person on one machine:
+
+    - development mode, with no authentication;
+    - SQLite in the `trunks-data` volume;
+    - the `-stdio` image, so upstreams started with `npx` or `uvx` work;
+    - port `8080` published on `127.0.0.1` only;
+    - `TRUNKS_ALLOWED_HOSTS` set to `localhost,127.0.0.1`.
+
+    ```bash
+    docker compose up -d
+    trunks --registry http://localhost:8080 list servers
+    ```
+  </Tab>
+  <Tab title="Production">
+    `docker-compose.prod.yaml` runs enterprise mode on PostgreSQL 16. It uses the distroless image; switch to the `-stdio` tag to run `stdio` upstreams inside the container.
+
+    <Steps>
+      <Step title="Create the environment file">
+        ```bash
+        cp .env.example .env
+        ```
+
+        Fill in `.env`:
+
+        | Variable | Value |
+        |---|---|
+        | `POSTGRES_PASSWORD` | Password of the `trunks` PostgreSQL role. Required. |
+        | `TRUNKS_PUBLIC_URL` | The address people and MCP clients use, for example `https://trunks.example.com`. Required. |
+        | `TRUNKS_ALLOWED_HOSTS` | The public host name, for example `trunks.example.com`. Required. |
+        | `TRUNKS_OIDC_ISSUER`, `TRUNKS_OIDC_CLIENT_ID`, `TRUNKS_OIDC_CLIENT_SECRET` | Optional, for [single sign-on](/trunks/guides/single-sign-on). Also uncomment the matching lines in `docker-compose.prod.yaml`. |
+      </Step>
+      <Step title="Start the stack">
+        ```bash
+        docker compose -f docker-compose.prod.yaml up -d
+        ```
+
+        Trunks waits for PostgreSQL to pass its health check, then starts. It listens on `0.0.0.0:8080` inside the container; the compose file publishes that port on the host's `127.0.0.1:8080` only.
+      </Step>
+      <Step title="Initialize the server">
+        Put a TLS-terminating reverse proxy in front of port `8080`, then initialize the server once:
+
+        ```bash
+        trunks --registry https://trunks.example.com init-server
+        ```
+
+        The first caller becomes the administrator, so do this before anyone else can reach the server. See [Enterprise mode](/trunks/guides/enterprise-mode).
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Next steps
+
+- Run your first server and tool call: [Quickstart](/trunks/quickstart).
+- Configure the database, network and reverse proxy: [Operations](/trunks/guides/operations).
+- See every setting: [Configuration reference](/trunks/reference/configuration).

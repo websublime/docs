@@ -1,0 +1,102 @@
+---
+title: "Modes and identities"
+sidebarTitle: "Modes and identities"
+description: "Development mode versus enterprise mode, and the users, teams, MCP clients, grants and tokens of a shared server."
+---
+
+## Modes
+
+A Trunks server runs in one of two modes. You set it with `--mode` or `TRUNKS_MODE` (default `development`).
+
+| | `development` | `enterprise` |
+|---|---|---|
+| Authentication | None | An access token (or a single sign-on session) on every request |
+| Who sees what | Everyone sees everything | Each user and MCP client sees only what it was granted |
+| Who manages it | Anyone who can reach the server | Administrators |
+| Initialization | Automatic | `trunks init-server`, once |
+| Default listen address | `127.0.0.1` | Every interface |
+| `/metrics` | Off by default | On by default |
+
+Development mode is for one person on one machine.
+
+<Warning>
+  Development mode has no access control at all. Bind it to another address with `--host` only on a network where everyone who can reach it is trusted. Trunks warns at start-up when you do. Container images listen on every interface in both modes, so publish the port on `127.0.0.1` there.
+</Warning>
+
+The mode is recorded in the database when it is first initialized. If you later start the server with a different `TRUNKS_MODE`, start-up fails; Trunks does not convert the database.
+
+### Initializing enterprise mode
+
+A new enterprise server refuses everything until you initialize it:
+
+```bash
+trunks --registry https://trunks.example.com init-server
+```
+
+The first caller becomes the administrator, so initialize the server before anyone else can reach it. The command prints the administrator's token once and saves it to the CLI configuration file. For the full setup, see [Enterprise mode](/trunks/guides/enterprise-mode).
+
+## Identities
+
+Enterprise mode has two kinds of identity, each with its own token:
+
+| Identity | Used by | Authenticates on |
+|---|---|---|
+| **User**, with role `admin` or `user` | People, through the CLI, the REST API and the web console | `/api/v0` |
+| **MCP client** | Agents and MCP client applications | `/mcp` and `/v0/groups/<name>/mcp` |
+
+The two are separate on purpose. The MCP endpoints refuse a user token, and the REST API refuses an MCP client token.
+
+### Users
+
+There is one local administrator, `admin`, created by `trunks init-server`. Users you create with `trunks create user` have the role `user`. People can also sign in through [single sign-on](/trunks/guides/single-sign-on).
+
+### Teams
+
+**Teams** group users so that you can grant access once for several people. Each member has a team role:
+
+| Team role | Can |
+|---|---|
+| `member` | Use what the team was granted |
+| `maintainer` | The same, and add or remove team members and manage the team's MCP clients |
+
+### Grants
+
+A **grant** gives a user or a team the use of a server or a [tool group](/trunks/guides/tool-groups). A user can use everything granted to them directly plus everything granted to their teams.
+
+- Administrators can use everything.
+- A user with no grant sees nothing.
+
+### MCP clients
+
+An **MCP client** is the identity of an agent or an application. It can have an **owner**, a user or a team. An owned client can never reach more than its owner can, and it loses access when its owner does. Its allow list can narrow that access to some servers.
+
+Use one MCP client per agent or per application, so that you can replace or remove one token without affecting the others.
+
+### Hidden by default
+
+Anything outside a caller's reach is answered exactly as if it did not exist, in listings and in errors alike.
+
+## Tokens
+
+- Trunks shows each access token **once**, when it creates the user or MCP client. Store it right away.
+- `trunks login <token>` and `trunks init-server` save the token and the server address in the CLI configuration file, so later commands need neither.
+- Replacing a token makes the old one stop working at once. Use `trunks update user <name>` for a user, or `trunks update mcp-client <name> --rotate-token` for an MCP client.
+- If the administrator's token is lost and no other administrator exists, the only way back is to restore or reset the database.
+
+The CLI configuration file is `config.toml` in a `trunks` folder of your platform's configuration directory. Set `TRUNKS_CONFIG` to use another path.
+
+| Platform | Path |
+|---|---|
+| Linux | `~/.config/trunks/config.toml` (or `$XDG_CONFIG_HOME/trunks/config.toml`) |
+| macOS | `~/Library/Application Support/trunks/config.toml` |
+| Windows | `%APPDATA%\trunks\config.toml` |
+
+<Note>
+  The database stores access tokens of users and MCP clients in clear text. Protect the database and its backups like a password vault. See [Operations](/trunks/guides/operations).
+</Note>
+
+## Next steps
+
+- Create users, teams, grants and MCP clients: [Enterprise mode](/trunks/guides/enterprise-mode).
+- Let people sign in with your identity provider: [Single sign-on](/trunks/guides/single-sign-on).
+- Configure an MCP client with its token: [Connecting clients](/trunks/guides/connecting-clients).

@@ -1,0 +1,103 @@
+---
+title: "MCP endpoints"
+sidebarTitle: "MCP endpoints"
+description: "The /mcp and tool group endpoints: transport, naming, supported methods, client authentication, sessions and serverInfo."
+---
+
+Trunks exposes its catalog to MCP clients on two kinds of endpoint. Both speak the MCP Streamable HTTP transport.
+
+| Path | Exposes | `serverInfo.name` |
+|---|---|---|
+| `/mcp` | Every enabled tool, prompt and resource the client may use. | `Trunks MCP Gateway` |
+| `/v0/groups/<name>/mcp` | The effective tools of one [tool group](/trunks/guides/tool-groups). No prompts and no resources. | `Trunks gateway for tool group: <name>` |
+
+`serverInfo.version` is the Trunks version, for example `0.1.0-rc.2`. Both endpoints advertise the `tools`, `prompts` and `resources` capabilities. A group endpoint answers `prompts/list` and `resources/list` with empty lists.
+
+To point a client at an endpoint, see [Connecting clients](/trunks/guides/connecting-clients).
+
+## Transport
+
+- Send JSON-RPC requests with `POST` and `Accept: application/json, text/event-stream`. Answers arrive as an event stream.
+- The older HTTP+SSE transport is not offered.
+- Request bodies are at most 4 MiB. A body may pause for at most 30 s while it is being sent.
+- The `Host` header must be one of `TRUNKS_ALLOWED_HOSTS`, otherwise 403. By default only loopback names are accepted. See [Configuration](/trunks/reference/configuration#basics).
+- Trunks never forwards the headers a client sends to upstream servers.
+
+## Names
+
+Trunks gives every item a name that is unique across all upstream servers. In a resource URI, `<encoded-uri>` is the upstream's original URI in standard base64 without padding. It rewrites names on the way in and out, so an upstream sees its own names.
+
+| Item | Name on the endpoint | Example |
+|---|---|---|
+| Tool | `<server>__<name>` | `github__create_issue` |
+| Prompt | `<server>__<name>` | `github__summarize` |
+| Resource | `trunks://res/<server>/<encoded-uri>` | `trunks://res/files/ZmlsZTovLy9SRUFETUUubWQ` for `file:///README.md` on server `files` |
+
+In a `resources/read` result, contents that carry the upstream's original URI, or no URI, come back with the `trunks://` URI you asked for. See [Core concepts](/trunks/concepts/core-concepts) for the naming rules.
+
+## Supported methods
+
+| Method | On `/mcp` | On a group endpoint |
+|---|---|---|
+| `tools/list` | Enabled tools the client may use. | Enabled tools of the group the client may use. |
+| `tools/call` | Calls the tool on its upstream. | Only tools of the group. |
+| `prompts/list` | Enabled prompts of the servers the client may use. | Empty list. |
+| `prompts/get` | Renders the prompt on its upstream. | Always "not found". |
+| `resources/list` | Enabled resources of the servers the client may use. | Empty list. |
+| `resources/read` | Reads the resource from its upstream. | Always "not found". |
+
+Resource subscriptions, resource templates and list-change notifications are not offered.
+
+### Errors
+
+| Situation | JSON-RPC error |
+|---|---|
+| The tool, prompt or resource does not exist, is disabled, or is outside the client's reach | `-32602` (invalid params) with `tool '<name>' not found` (likewise `prompt '<name>' not found`, `resource '<uri>' not found`) |
+| A malformed name or URI | `-32602` with the reason |
+| The upstream fails or does not answer within `TRUNKS_REQUEST_TIMEOUT_SEC` | internal error (`-32603`) naming the upstream |
+
+A tool result with `isError: true` is the tool's own answer, not a JSON-RPC error.
+
+Some failures happen before the MCP layer and are plain HTTP answers:
+
+| Status | When | Body |
+|---|---|---|
+| 401 | Enterprise mode with a missing or invalid MCP client token. | JSON |
+| 403 | The server is not initialized. | JSON |
+| 403 | The `Host` header is not allowed. | Plain text, from the MCP transport |
+| 404 | The tool group does not exist. | JSON: `{"error":"tool group: <name> not found"}` |
+| 413 | The body is larger than 4 MiB. | Plain text, from the MCP transport |
+
+## Client authentication
+
+<Tabs>
+  <Tab title="Development mode">
+    No token is needed. Every client sees and can call everything that is enabled.
+  </Tab>
+  <Tab title="Enterprise mode">
+    Every request needs an **MCP client** token:
+
+    ```http
+    Authorization: Bearer <mcp-client-token>
+    ```
+
+    - A user token does not work here, and neither does the web console's session cookie.
+    - A missing token answers 401 `missing MCP client access token`; an unknown one answers 401 `invalid MCP client token`.
+    - What the client may use comes from its allow list and its owner's grants. Anything else reads exactly like something that does not exist.
+
+    Create a client with [`trunks create mcp-client`](/trunks/reference/cli#trunks-create) or in the web console. See [Enterprise mode](/trunks/guides/enterprise-mode) for how the allow list and the owner combine.
+  </Tab>
+</Tabs>
+
+## Sessions
+
+Trunks keeps a session for each client that negotiates an MCP protocol version that uses sessions:
+
+- The `initialize` answer carries an `Mcp-Session-Id` header. Send it with every later request.
+- `GET` on the endpoint, with the session id, opens a stream for server messages. `DELETE` ends the session.
+- Sessions live in the memory of the server process. A restart ends them, and clients must initialize again.
+- Each group endpoint has its own sessions. Deleting a group drops them.
+
+Authentication happens on every request, not once per session, so a revoked token stops working at once. The catalog is also read on every request: a tool you disable or a grant you remove takes effect on the next call, without reconnecting.
+
+These client sessions are separate from the sessions Trunks keeps with upstream servers, which `session_mode` controls. See [Upstream servers](/trunks/guides/upstream-servers).

@@ -297,6 +297,8 @@ Agents and humans read it before they change anything in this repository.
     - two vocabularies, `Mintlify` (Mintlify's default word list, copied) and `websublime`, in `.vale/config/vocabularies/<name>/accept.txt`.
   - Correct technical terms flagged by `vale-spellcheck` go into the `websublime` vocabulary, one regex per line. Never reword correct content just to quiet the linter.
   - Real misspellings get fixed in the page.
+- **Amendment (2026-11-12, issue #9):** the `{…}` **block** ignore now matches a single line (`(?m)^(\{[^\n]*\})$`). Mintlify's `(?sm)^({.+.*})` matched from any line that starts with `{`, such as a JSON code block, to the end of the file. That broke code-fence detection and sent code to the speller (for example `session_mode` inside a JSON sample). The token ignores are unchanged.
+- **Amendment (2026-11-12, PR #10):** a local `vale` run is not a full stand-in for Mintlify's check. Mintlify's dictionary flagged words that local Vale 3.26 accepts, such as distroless, loopback and userinfo. When `vale-spellcheck` reports correct terms, add them to the `websublime` vocabulary in the same pull request. The vocabulary file is kept sorted.
 - **Why:** On PR #4, `vale-spellcheck` reported 37 findings. All of them were correct technical terms: changesets, monorepos, Hono, Vitest, glibc, musl, Streamable and similar. Mintlify's built-in vocabulary cannot be extended without a repository config.
 
 ## D22: Images and design previews
@@ -343,3 +345,26 @@ Agents and humans read it before they change anything in this repository.
      - Reports describe internal material without naming internal files.
      - `sync/` is excluded from the site.
 - **Why:** Miguel's choices on issue #5.
+
+## D24: Generated pages
+
+- **Status:** accepted (2026-11-12, issue #9). Puts the "generated" content kind from D2 into practice.
+- **Decision:**
+  - A registry source may declare `generated:` entries, each with `page`, `generator`, `from`, `title`, optional `sidebarTitle`, and `description`. `scripts/gen.ts` builds the page from `from`, read at the source's `lastSynced` commit:
+    - the local checkout when it exists;
+    - otherwise the GitHub API, which is how CI reads it.
+  - **Generators:**
+    - `markdown`: an upstream Markdown document. Its H1 is dropped, HTML comments (maintainer notes) are dropped, and `{`, `}` and `<` are escaped for MDX outside code.
+    - `keep-a-changelog`: a Keep a Changelog file becomes one `<Update>` per released version. `[Unreleased]` and the preamble are left out (D5).
+  - A generated page starts with a comment naming the generator, the source and the commit. **Never edit it by hand.**
+  - The `from` file must be in the page's `watch` list (`--validate`).
+  - **CI** runs `bun scripts/gen.ts --check`.
+  - **Sync order:** update the pages, then `--mark-synced`, then `bun scripts/gen.ts --project <slug>`.
+- **First use:** `trunks/reference/cli` (from `docs/guide/reference/cli.md`, which Trunks generates from its binary) and `trunks/changelog`.
+- **Amendment (2026-11-12, PR #10 review):** the MDX conversion follows CommonMark structure:
+  - Fences open and close with the same character and length.
+  - Inline code spans may wrap across lines.
+  - Outside code: every `<` becomes `&lt;`, except autolinks, which become links. `{` and `}` are escaped. Existing backslash escapes are kept. HTML comments are dropped.
+  - `keep-a-changelog` ignores headings inside code fences, reads linked headings, en-dash dates and `[YANKED]`, and removes only the version link definitions.
+  - `--project` with an unknown slug fails. A full `--check` also fails on an orphan generated page, meaning one that has the generated header but no registry entry.
+  - Tested by compiling edge cases with `@mdx-js/mdx`.

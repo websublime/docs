@@ -132,11 +132,28 @@ claude mcp add --transport http trunks http://127.0.0.1:8080/mcp
 - Trunks is not published on crates.io. The `trunks` crate there is an unrelated project, so `cargo install trunks` installs the wrong tool. Install from GitHub Releases, from source (`cargo install --git`) or from a container image.
 - OIDC for MCP clients, organisations and declarative configuration are not part of this release.
 
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/trunks/quickstart">
+    Install Trunks, register a server and call your first tool.
+  </Card>
+  <Card title="Core concepts" icon="diagram-project" href="/trunks/concepts/core-concepts">
+    Names, transports, session modes and endpoints.
+  </Card>
+  <Card title="Upstream servers" icon="server" href="/trunks/guides/upstream-servers">
+    Connect stdio and Streamable HTTP servers, with OAuth when needed.
+  </Card>
+  <Card title="CLI reference" icon="terminal" href="/trunks/reference/cli">
+    Every command and flag, generated from the binary.
+  </Card>
+</Columns>
+
 ## Links
 
 - [GitHub repository](https://github.com/websublime/trunks)
 - [Release `v0.1.0-rc.2`](https://github.com/websublime/trunks/releases/tag/v0.1.0-rc.2)
-- [Changelog at `v0.1.0-rc.2`](https://github.com/websublime/trunks/blob/v0.1.0-rc.2/CHANGELOG.md)
+- [Changelog](/trunks/changelog)
 - [Container images](https://github.com/websublime/trunks/pkgs/container/trunks)
 - [License (MPL-2.0)](https://github.com/websublime/trunks/blob/v0.1.0-rc.2/LICENSE)
 

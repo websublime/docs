@@ -231,6 +231,119 @@ projects:
             - crates/trunks-core/src/metrics.rs
             - web/app/src/pages/**
             - web/app/src/lib/nav.ts
+          trunks/reference/cli:
+            - docs/guide/reference/cli.md
+          trunks/changelog:
+            - CHANGELOG.md
+          trunks/quickstart:
+            - docs/guide/quickstart.md
+            - dist-workspace.toml
+            - "crates/trunks/src/commands/{start,register,usage,invoke,manage}.rs"
+            - crates/trunks/src/main.rs
+            - crates/trunks-types/src/api.rs
+            - crates/trunks-api/src/routes/invoke.rs
+          trunks/installation:
+            - docs/guide/operations.md
+            - docs/guide/quickstart.md
+            - dist-workspace.toml
+            - Cargo.toml
+            - rust-toolchain.toml
+            - Dockerfile
+            - .github/workflows/docker.yml
+            - .github/build-setup.yml
+            - docker-compose.yaml
+            - docker-compose.prod.yaml
+            - .env.example
+            - crates/trunks-dashboard/src/lib.rs
+            - crates/trunks/src/main.rs
+          trunks/concepts/core-concepts:
+            - docs/guide/concepts.md
+            - "crates/trunks-types/src/{names,enums}.rs"
+            - "crates/trunks-core/src/{catalog,sessions,upstream,gateway}.rs"
+            - "crates/trunks/src/commands/{register,start}.rs"
+            - crates/trunks-api/src/routes/mod.rs
+            - crates/trunks-api/src/serve.rs
+          trunks/concepts/modes-and-identities:
+            - docs/guide/concepts.md
+            - docs/guide/enterprise.md
+            - docs/guide/operations.md
+            - "crates/trunks-core/src/{mode,identity,access}.rs"
+            - crates/trunks-types/src/enums.rs
+            - "crates/trunks/src/commands/{start,identities,auth}.rs"
+            - crates/trunks/src/config.rs
+            - crates/trunks-api/src/middleware.rs
+          trunks/guides/upstream-servers:
+            - docs/guide/upstreams.md
+            - "crates/trunks/src/commands/{register,manage,start}.rs"
+            - "crates/trunks/src/{envsubst,main}.rs"
+            - "crates/trunks-types/src/{api,enums,names}.rs"
+            - "crates/trunks-core/src/{sessions,oauth,upstream}.rs"
+            - Dockerfile
+          trunks/guides/tool-groups:
+            - docs/guide/tool-groups.md
+            - crates/trunks/src/commands/groups.rs
+            - "crates/trunks-types/src/{api,names}.rs"
+            - crates/trunks-core/src/groups.rs
+            - crates/trunks-api/src/routes/groups.rs
+            - "crates/trunks-api/src/{mcp,lib}.rs"
+          trunks/guides/connecting-clients:
+            - docs/guide/clients.md
+            - crates/trunks-api/src/mcp.rs
+            - crates/trunks-types/src/error.rs
+            - "crates/trunks-core/src/{error,gateway}.rs"
+            - crates/trunks/src/commands/start.rs
+          trunks/guides/enterprise-mode:
+            - docs/guide/enterprise.md
+            - "crates/trunks-core/src/{access,identity}.rs"
+            - "crates/trunks/src/commands/{access,identities,auth}.rs"
+            - "crates/trunks/src/{config,main}.rs"
+            - "crates/trunks-api/src/routes/{access,identities,registry,public}.rs"
+          trunks/guides/single-sign-on:
+            - docs/guide/enterprise.md
+            - docs/guide/reference/configuration.md
+            - crates/trunks/src/commands/start.rs
+            - "crates/trunks-core/src/{oidc,login}.rs"
+            - crates/trunks-api/src/routes/auth.rs
+            - crates/trunks-db/src/repos/sessions.rs
+          trunks/guides/operations:
+            - docs/guide/operations.md
+            - docs/guide/reference/configuration.md
+            - crates/trunks/src/commands/start.rs
+            - crates/trunks-core/src/metrics.rs
+            - "crates/trunks-api/src/{lib,serve,middleware}.rs"
+            - "crates/trunks-api/src/routes/{public,dashboard}.rs"
+            - crates/trunks-db/src/migrate.rs
+            - crates/trunks-db/migrations/**
+          trunks/reference/configuration:
+            - docs/guide/reference/configuration.md
+            - crates/trunks/src/commands/start.rs
+            - "crates/trunks/src/{config,main,envsubst}.rs"
+            - "crates/trunks-api/src/{lib,mcp}.rs"
+          trunks/reference/http-api:
+            - docs/guide/reference/api.md
+            - crates/trunks-api/src/lib.rs
+            - crates/trunks-api/src/routes/*.rs
+            - "crates/trunks-api/src/{middleware,error}.rs"
+            - "crates/trunks-types/src/{error,api}.rs"
+          trunks/reference/mcp-endpoints:
+            - docs/guide/reference/api.md
+            - "crates/trunks-api/src/{mcp,middleware}.rs"
+            - "crates/trunks-core/src/{gateway,identity,error}.rs"
+            - "crates/trunks-types/src/{names,error}.rs"
+            - crates/trunks-api/src/routes/groups.rs
+            - Cargo.lock
+        generated:
+          - page: trunks/reference/cli
+            generator: markdown
+            from: docs/guide/reference/cli.md
+            title: CLI reference
+            sidebarTitle: CLI
+            description: "Every trunks command, flag and environment variable, generated from the command definitions."
+          - page: trunks/changelog
+            generator: keep-a-changelog
+            from: CHANGELOG.md
+            title: Changelog
+            description: Changes in each Trunks release.
   - slug: unblock
     name: unblock
     repo: websublime/unblock

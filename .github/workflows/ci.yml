@@ -56,3 +56,6 @@ jobs:
           bun-version: 1.4.3
       - run: bun scripts/leak-lint.ts
       - run: bun scripts/sync.ts --validate
+      - run: bun scripts/gen.ts --check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,82 @@
+---
+title: "Core concepts"
+sidebarTitle: "Core concepts"
+description: "How Trunks publishes upstream MCP servers: the catalog, names, transports, session modes, enabled state and endpoints."
+---
+
+## Gateway and upstream servers
+
+Trunks sits between MCP clients and MCP servers. The servers you register are **upstream servers**. Your clients connect to the Trunks MCP endpoint and never to the upstreams directly.
+
+```text
+MCP clients ──▶  Trunks  /mcp  ──▶  upstream "github"  (HTTP)
+                                ──▶  upstream "files"   (local process)
+                                ──▶  upstream "jira"    (HTTP + OAuth)
+```
+
+When you register a server, Trunks connects to it once, reads its tools, prompts and resources, and stores them. That stored list is the **catalog**. Listing tools never contacts an upstream; only calling one does. To pick up tools that an upstream added later, register it again with `--force`.
+
+Trunks uses only the upstream credentials you configured. It never passes headers from an MCP client to an upstream, including the client's `Authorization` header.
+
+## Names
+
+Trunks publishes everything under the name of the server it came from.
+
+| Kind | Published as | Example |
+|---|---|---|
+| Tool | `<server>__<tool>` | `github__create_issue` |
+| Prompt | `<server>__<prompt>` | `docs__summarize` |
+| Resource | `trunks://res/<server>/<encoded original URI>` | `trunks://res/files/ZmlsZTovLy9SRUFETUUubWQ` |
+
+A server name contains only letters, digits, `_` and `-`. It cannot contain `__` and cannot end in `_`. So the first `__` in a published name always separates the server from the tool or prompt.
+
+The encoded part of a resource URI is the original URI in base64, without padding. Trunks rewrites resource URIs in both directions: clients only see `trunks://` URIs, and each upstream only sees its own.
+
+## Transports
+
+| Upstream transport | How Trunks reaches it |
+|---|---|
+| `stdio` | Trunks starts the command as a child process and speaks MCP over its stdin and stdout. |
+| `streamable_http` | Trunks sends HTTP requests to the server's URL. |
+
+Towards clients, Trunks speaks Streamable HTTP only. The older HTTP+SSE transport is not supported in either direction.
+
+To register each kind, see [Upstream servers](/trunks/guides/upstream-servers).
+
+## Session modes
+
+You choose a session mode for each upstream when you register it:
+
+- `stateless` (default): every call opens a new connection to the upstream and closes it afterwards. For a `stdio` server, that means Trunks starts the process on every call.
+- `stateful`: Trunks keeps one connection open and reuses it. After a failure, it reopens the connection on the next call. When you set `TRUNKS_SESSION_IDLE_TIMEOUT_SEC`, Trunks closes the connection after that many seconds of inactivity. The default, `0`, keeps it open.
+
+<Tip>
+  Use `stateful` for servers that are slow to start, such as anything launched through `npx` or `uvx`, and for servers that keep state between calls.
+</Tip>
+
+All clients of the gateway share a stateful connection.
+
+## Enabled and disabled
+
+You can disable servers, tools, prompts and resources without removing them. MCP clients don't see a disabled entry and can't call it. The CLI, the REST API and the web console still list it, marked as disabled.
+
+Disabling a server hides everything it provides. When you enable it again, each tool returns to its own previous state.
+
+## Tool groups
+
+A **tool group** is a named selection of tools with its own MCP endpoint, `/v0/groups/<name>/mcp`. A client connected there sees only that selection. Groups contain tools only, not prompts or resources. See [Tool groups](/trunks/guides/tool-groups).
+
+## Modes and identities
+
+A Trunks server runs in development mode, with no authentication, or in enterprise mode, with users, teams, MCP clients and grants. See [Modes and identities](/trunks/concepts/modes-and-identities).
+
+## Endpoints
+
+| Path | What it is | Who uses it |
+|---|---|---|
+| `/mcp` | MCP endpoint with everything the caller may use | MCP clients |
+| `/v0/groups/<name>/mcp` | MCP endpoint limited to one tool group | MCP clients |
+| `/api/v0/...` | REST API, used by the CLI and the web console | Users |
+| `/health`, `/metadata`, `/metrics` | Liveness, version and Prometheus metrics | Anyone who can reach them |
+
+For the details, see the [HTTP API reference](/trunks/reference/http-api) and [MCP endpoints](/trunks/reference/mcp-endpoints).

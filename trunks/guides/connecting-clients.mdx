@@ -1,0 +1,131 @@
+---
+title: "Connecting clients"
+sidebarTitle: "Connecting clients"
+description: "Connect Claude Code, Cursor, VS Code and Claude Desktop to Trunks over Streamable HTTP, in development or enterprise mode."
+---
+
+Any MCP client that supports the Streamable HTTP transport can use Trunks. It needs two things:
+
+| | Development mode | Enterprise mode |
+|---|---|---|
+| URL | `http://127.0.0.1:8080/mcp` | `https://trunks.example.com/mcp` |
+| Header | none | `Authorization: Bearer <MCP client token>` |
+
+To expose only a [tool group](/trunks/guides/tool-groups), use `/v0/groups/<name>/mcp` instead of `/mcp`.
+
+The token is the one `trunks create mcp-client` prints. See [Enterprise mode](/trunks/guides/enterprise-mode) and [Modes and identities](/trunks/concepts/modes-and-identities).
+
+<Warning>
+  A user's token, the one `trunks login` uses, doesn't work on the MCP endpoints. Use an MCP client token.
+</Warning>
+
+The examples below use the enterprise form. For development mode, use the local URL and leave out the header.
+
+## Configure your client
+
+<Tabs>
+  <Tab title="Claude Code">
+    Add Trunks from the command line:
+
+    ```bash
+    claude mcp add --transport http trunks https://trunks.example.com/mcp \
+      --header "Authorization: Bearer $TRUNKS_MCP_TOKEN"
+    ```
+
+    Or share it with a project through `.mcp.json`, with the token taken from each person's environment:
+
+    ```json .mcp.json
+    {
+      "mcpServers": {
+        "trunks": {
+          "type": "http",
+          "url": "https://trunks.example.com/mcp",
+          "headers": { "Authorization": "Bearer ${TRUNKS_MCP_TOKEN}" }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Cursor">
+    Edit `~/.cursor/mcp.json` for all projects, or `.cursor/mcp.json` for one project:
+
+    ```json mcp.json
+    {
+      "mcpServers": {
+        "trunks": {
+          "url": "https://trunks.example.com/mcp",
+          "headers": { "Authorization": "Bearer ${env:TRUNKS_MCP_TOKEN}" }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="VS Code (Copilot)">
+    Edit `.vscode/mcp.json` in the workspace, or the user-level `mcp.json`. VS Code asks for the token once and stores it:
+
+    ```json .vscode/mcp.json
+    {
+      "inputs": [
+        { "type": "promptString", "id": "trunks-token", "description": "Trunks MCP client token", "password": true }
+      ],
+      "servers": {
+        "trunks": {
+          "type": "http",
+          "url": "https://trunks.example.com/mcp",
+          "headers": { "Authorization": "Bearer ${input:trunks-token}" }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Claude Desktop">
+    Claude Desktop starts local MCP servers from `claude_desktop_config.json`. Connect it to Trunks through [`mcp-remote`](https://github.com/geelen/mcp-remote), a small local bridge that needs Node.js:
+
+    ```json claude_desktop_config.json
+    {
+      "mcpServers": {
+        "trunks": {
+          "command": "npx",
+          "args": [
+            "-y", "mcp-remote", "https://trunks.example.com/mcp",
+            "--transport", "http-only",
+            "--header", "Authorization:${TRUNKS_AUTH}"
+          ],
+          "env": { "TRUNKS_AUTH": "Bearer <MCP client token>" }
+        }
+      }
+    }
+    ```
+
+    The header value goes through `env` because some clients mishandle spaces inside `args`.
+
+    <Warning>
+      For a plain `http://` address that isn't on your own machine, `mcp-remote` also needs `--allow-http`. Use it only on a network you trust.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Other clients and your own agents
+
+Set the URL and the `Authorization` header wherever the client takes a remote (Streamable HTTP) MCP server. A client that only supports local stdio servers can use `mcp-remote`, as shown for Claude Desktop. Clients that only speak the older HTTP+SSE transport can't connect.
+
+## What the client sees
+
+- Tools named `<server>__<tool>`, prompts named `<server>__<prompt>`, and resources with `trunks://` URIs, from every server the client can use.
+- Trunks doesn't notify clients when the list changes. After you register a server or change a grant, refresh or reconnect the client to see the new list.
+- A tool that was disabled, removed or put out of the client's reach answers `tool '<name>' not found`.
+
+## Troubleshooting
+
+| Symptom | Cause |
+|---|---|
+| `403 Forbidden: Host header is not allowed` | The host name the client uses isn't in `TRUNKS_ALLOWED_HOSTS`. When it is empty, only `localhost`, `127.0.0.1` and `::1` are accepted. Set it to the server's public name. |
+| `401 missing MCP client access token` | Enterprise mode, and the client sent no `Authorization` header. |
+| `401 invalid MCP client token` | The token isn't an MCP client token: it's wrong, replaced, or a user token. |
+| `403 server is not initialized` | Enterprise server on which `trunks init-server` hasn't run. |
+| Connects, but the tool list is empty | The MCP client can reach nothing (no owner and an empty allow list, or an owner without grants), or the URL is a tool group with no enabled tools. |
+| Answers arrive late or all at once | A reverse proxy is buffering the response. See [Operations](/trunks/guides/operations). |
+
+<Note>
+  These setups follow each client's own documentation. The Trunks automated tests cover the MCP protocol with a generic client; they don't run these applications.
+</Note>
