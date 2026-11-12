@@ -2,26 +2,59 @@
 title: "vite-open-api-server"
 sidebarTitle: "Overview"
 description: "Vite plugin that runs a local mock server from your OpenAPI spec, with handlers, seeds and DevTools."
+mode: "custom"
 ---
 
-<div className="not-prose ws-hero" data-accent="purple">
-  <div className="ws-hero-head">
-    <p className="ws-hero-tagline">A local OpenAPI mock server inside your Vite dev server.</p>
+import Nav from "/snippets/nav/vite-open-api-server.mdx";
+
+<div className="ws-page" data-accent="purple" data-gray="neutral">
+
+<section className="ws-hero ws-hero-project" id="top">
+  <svg className="ws-lines" aria-hidden="true" viewBox="0 0 1440 460" preserveAspectRatio="none">
+    <g className="ws-lines-base">
+      <path className="ws-shade-11" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-12" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-9" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-11" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+    <g>
+      <path className="ws-pulse ws-t1 ws-shade-11" pathLength="1000" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t2" pathLength="1000" d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t3 ws-shade-12" pathLength="1000" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t4 ws-shade-9" pathLength="1000" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t6 ws-shade-11" pathLength="1000" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+  </svg>
+  <div className="ws-wrap ws-hero-inner">
+    <div className="ws-hero-copy">
+      <div className="ws-crumb" role="navigation" aria-label="Breadcrumb"><a href="/">docs://websublime</a> / <span>vite-open-api-server</span></div>
+      <div className="ws-title-row"><h1 className="ws-title">vite-open-api-server</h1></div>
+      <p className="ws-lede">Vite plugin that runs a local mock server from your OpenAPI spec, with handlers, seeds and DevTools.</p>
+      <div className="ws-stats">
+        <div className="ws-stat"><span className="ws-label">Version</span><span className="ws-stat-value">0.23.3</span></div>
+        <div className="ws-stat"><span className="ws-label">License</span><span className="ws-stat-value">MIT</span></div>
+        <div className="ws-stat"><span className="ws-label">Stack</span><span className="ws-stat-value">TypeScript · Vite · Hono</span></div>
+      </div>
+      <div className="ws-actions">
+        <a className="ws-btn ws-btn-accent" href="#install">Install</a>
+        <a className="ws-btn" href="https://github.com/websublime/vite-open-api-server">GitHub</a>
+      </div>
+    </div>
   </div>
-  <div className="ws-stats">
-    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">0.23.3</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">TypeScript · Vite · Hono</span></div>
-  </div>
-  <div className="ws-actions">
-    <a className="ws-button ws-button-solid" href="https://github.com/websublime/vite-open-api-server">GitHub</a>
-    <a className="ws-button" href="#install">Install</a>
-  </div>
-</div>
+</section>
+
+<div className="ws-wrap ws-doc">
+
+<Nav />
+
+<div className="ws-docbody prose dark:prose-invert" role="main">
+
+<h2 id="overview">Overview</h2>
 
 `@websublime/vite-plugin-open-api-server` is a Vite plugin that starts a mock server from an OpenAPI spec and proxies your API path to it. It is for frontend developers who want to build against an API before the backend is ready, or without running it.
 
-## What you can do
+<h2 id="what-you-can-do">What you can do</h2>
 
 - Serve every operation in an OpenAPI 2.0 or 3.x spec, from a local file or a URL, in YAML or JSON.
 - Get realistic responses generated from your schemas with Faker.js.
@@ -30,7 +63,7 @@ description: "Vite plugin that runs a local mock server from your OpenAPI spec, 
 - Edit handlers and seeds and see them reload without restarting Vite.
 - Inspect routes, the request timeline, store models and error simulations in the DevTools app, also available as a Vue DevTools tab.
 
-## Install
+<h2 id="install">Install</h2>
 
 The plugin supports Vite 5, 6 and 7 and needs Node.js `^20.19.0` or `>=22.12.0`.
 
@@ -50,7 +83,7 @@ yarn add -D @websublime/vite-plugin-open-api-server
 
 `vue` is a peer dependency of the package.
 
-## Quick example
+<h2 id="quick-example">Quick example</h2>
 
 Add the plugin to `vite.config.ts`:
 
@@ -86,34 +119,50 @@ export default defineHandlers({
 });
 ```
 
-## Links
+<h2 id="contribute">Contribute</h2>
+
+<Steps>
+  <Step title="Fork and set up">
+    Fork the repository, clone it and run `pnpm install`. You need Node.js `^20.19.0` or `>=22.12.0` and pnpm `9.15.0` or later.
+  </Step>
+  <Step title="Create a branch">
+    Use a prefix such as `feature/`, `fix/` or `docs/`, and write commits in Conventional Commits format.
+  </Step>
+  <Step title="Run the checks">
+    Run `pnpm lint`, `pnpm typecheck` and `pnpm test` before you push.
+  </Step>
+  <Step title="Open a pull request">
+    Follow the [contributing guide](https://github.com/websublime/vite-open-api-server/blob/%40websublime%2Fvite-plugin-open-api-server%400.23.3/CONTRIBUTING.md) and open a pull request.
+  </Step>
+</Steps>
+<Tip>Name handler and seed files with the plural suffix: `*.handlers.ts` and `*.seeds.ts`. The loader skips any other name.</Tip>
+
+<h2 id="links">Links</h2>
 
 - [GitHub repository](https://github.com/websublime/vite-open-api-server)
 - [npm package](https://www.npmjs.com/package/@websublime/vite-plugin-open-api-server)
 - [Changelog at 0.23.3](https://github.com/websublime/vite-open-api-server/blob/%40websublime%2Fvite-plugin-open-api-server%400.23.3/packages/server/CHANGELOG.md)
 - [README at 0.23.3](https://github.com/websublime/vite-open-api-server/blob/%40websublime%2Fvite-plugin-open-api-server%400.23.3/README.md)
 
-<Panel>
-  <h3>Install</h3>
+</div>
 
-  ```bash
-  pnpm add -D @websublime/vite-plugin-open-api-server
-  ```
+<div className="ws-toc" role="navigation" aria-label="On this page">
+  <p className="ws-label">On this page</p>
+  <a href="#overview">Overview</a>
+  <a href="#what-you-can-do">What you can do</a>
+  <a href="#install">Install</a>
+  <a href="#quick-example">Quick example</a>
+  <a href="#contribute">Contribute</a>
+  <a href="#links">Links</a>
+</div>
 
-  <h3>Contribute</h3>
-  <Steps>
-    <Step title="Fork and set up">
-      Fork the repository, clone it and run `pnpm install`. You need Node.js `^20.19.0` or `>=22.12.0` and pnpm `9.15.0` or later.
-    </Step>
-    <Step title="Create a branch">
-      Use a prefix such as `feature/`, `fix/` or `docs/`, and write commits in Conventional Commits format.
-    </Step>
-    <Step title="Run the checks">
-      Run `pnpm lint`, `pnpm typecheck` and `pnpm test` before you push.
-    </Step>
-    <Step title="Open a pull request">
-      Follow the [contributing guide](https://github.com/websublime/vite-open-api-server/blob/%40websublime%2Fvite-plugin-open-api-server%400.23.3/CONTRIBUTING.md) and open a pull request.
-    </Step>
-  </Steps>
-  <Tip>Name handler and seed files with the plural suffix: `*.handlers.ts` and `*.seeds.ts`. The loader skips any other name.</Tip>
-</Panel>
+</div>
+
+<div className="ws-footer" role="contentinfo">
+  <div className="ws-wrap ws-footer-inner">
+    <a className="ws-mono" href="/">← docs://websublime</a>
+    <a href="https://github.com/websublime/vite-open-api-server">GitHub</a>
+  </div>
+</div>
+
+</div>

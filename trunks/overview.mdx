@@ -2,33 +2,65 @@
 title: "Trunks"
 sidebarTitle: "Overview"
 description: "A self-hosted MCP gateway and registry in Rust: run all your MCP servers behind one Streamable HTTP endpoint."
+mode: "custom"
 tag: "RC"
 ---
 
-<div className="not-prose ws-hero" data-accent="teal">
-  <div className="ws-hero-head">
-    <span className="ws-badge ws-badge-rc">RC</span>
-    <p className="ws-hero-tagline">Run all your MCP servers behind one endpoint.</p>
+import Nav from "/snippets/nav/trunks.mdx";
+
+<div className="ws-page" data-accent="teal" data-gray="neutral">
+
+<section className="ws-hero ws-hero-project" id="top">
+  <svg className="ws-lines" aria-hidden="true" viewBox="0 0 1440 460" preserveAspectRatio="none">
+    <g className="ws-lines-base">
+      <path className="ws-shade-11" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-12" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-9" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-11" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+    <g>
+      <path className="ws-pulse ws-t1 ws-shade-11" pathLength="1000" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t2" pathLength="1000" d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t3 ws-shade-12" pathLength="1000" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t4 ws-shade-9" pathLength="1000" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t6 ws-shade-11" pathLength="1000" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+  </svg>
+  <div className="ws-wrap ws-hero-inner">
+    <div className="ws-hero-copy">
+      <div className="ws-crumb" role="navigation" aria-label="Breadcrumb"><a href="/">docs://websublime</a> / <span>trunks</span></div>
+      <div className="ws-title-row"><h1 className="ws-title">Trunks</h1><span className="ws-badge ws-badge-lg ws-badge-rc">RC</span></div>
+      <p className="ws-lede">A self-hosted MCP gateway and registry in Rust: run all your MCP servers behind one Streamable HTTP endpoint.</p>
+      <div className="ws-stats">
+        <div className="ws-stat"><span className="ws-label">Version</span><span className="ws-stat-value">0.1.0-rc.2</span></div>
+        <div className="ws-stat"><span className="ws-label">License</span><span className="ws-stat-value">MPL-2.0</span></div>
+        <div className="ws-stat"><span className="ws-label">Stack</span><span className="ws-stat-value">Rust · MCP</span></div>
+      </div>
+      <div className="ws-actions">
+        <a className="ws-btn ws-btn-accent" href="#install">Install</a>
+        <a className="ws-btn" href="https://github.com/websublime/trunks">GitHub</a>
+      </div>
+    </div>
   </div>
-  <div className="ws-stats">
-    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">0.1.0-rc.2</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MPL-2.0</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">Rust · MCP</span></div>
-  </div>
-  <div className="ws-actions">
-    <a className="ws-button ws-button-solid" href="https://github.com/websublime/trunks">GitHub</a>
-    <a className="ws-button" href="#install">Install</a>
-  </div>
-</div>
+</section>
+
+<div className="ws-wrap ws-doc">
+
+<Nav />
+
+<div className="ws-docbody prose dark:prose-invert" role="main">
+
+<h2 id="overview">Overview</h2>
+
+Trunks is a self-hosted MCP gateway and registry written in Rust. You register your MCP servers once, and your MCP clients and agents connect to a single Streamable HTTP endpoint. One binary is both the server (`trunks start`) and the management CLI. Use it alone on your machine in development mode, or share one server with a team in enterprise mode.
 
 <Frame caption="Web console design (version 0.4.0): the gateway overview in enterprise mode. The v0.1.0-rc.2 console may look different.">
   <img className="block dark:hidden" src="/images/trunks/console-overview-light.webp" alt="Trunks web console overview page in light mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, admin tiles for pending authorizations and open upstream sessions, and servers whose last connection failed" />
   <img className="hidden dark:block" src="/images/trunks/console-overview.webp" alt="Trunks web console overview page in dark mode, showing gateway mode, version and uptime, counts of servers, tools, prompts, resources and tool groups, admin tiles for pending authorizations and open upstream sessions, and servers whose last connection failed" />
 </Frame>
 
-Trunks is a self-hosted MCP gateway and registry written in Rust. You register your MCP servers once, and your MCP clients and agents connect to a single Streamable HTTP endpoint. One binary is both the server (`trunks start`) and the management CLI. Use it alone on your machine in development mode, or share one server with a team in enterprise mode.
-
-## What you can do
+<h2 id="what-you-can-do">What you can do</h2>
 
 - Put any number of upstream MCP servers behind one endpoint, `/mcp`. Tools and prompts appear as `<server>__<name>`, and resources as `trunks://res/<server>/<encoded-uri>`.
 - Connect upstreams over **stdio** (a process Trunks starts) or Streamable HTTP, with a bearer token, extra headers or OAuth 2.1.
@@ -37,7 +69,7 @@ Trunks is a self-hosted MCP gateway and registry written in Rust. You register y
 - Manage everything from the CLI, the REST API under `/api/v0`, or the built-in web console.
 - Store data in SQLite or PostgreSQL, and expose Prometheus metrics at `/metrics`.
 
-## Web console
+<h2 id="web-console">Web console</h2>
 
 <Note>
   These images are designs of the web console. They show version 0.4.0. The console in `v0.1.0-rc.2` has the same pages, but it may not look exactly like this.
@@ -76,7 +108,7 @@ Trunks is a self-hosted MCP gateway and registry written in Rust. You register y
   </Tab>
 </Tabs>
 
-## Install
+<h2 id="install">Install</h2>
 
 `v0.1.0-rc.2` is a pre-release. Name the tag in the installer URL, because the `latest/download` links only follow final releases.
 
@@ -105,7 +137,7 @@ docker run -d --name trunks -p 127.0.0.1:8080:8080 -v trunks-data:/data \
 
 Release archives cover Linux (glibc and musl), macOS and Windows, on x86_64 and arm64. The images are built for `linux/amd64` and `linux/arm64`.
 
-## Quick example
+<h2 id="quick-example">Quick example</h2>
 
 Start the server in development mode. It has no authentication and listens on `127.0.0.1:8080` only.
 
@@ -123,7 +155,7 @@ trunks invoke everything__echo --input '{"message":"hello"}'
 claude mcp add --transport http trunks http://127.0.0.1:8080/mcp
 ```
 
-## Status
+<h2 id="status">Status</h2>
 
 `v0.1.0-rc.2` is a release candidate of the first public version. The gateway, registry, CLI, access model, single sign-on and web console are implemented and tested.
 
@@ -132,7 +164,7 @@ claude mcp add --transport http trunks http://127.0.0.1:8080/mcp
 - Trunks is not published on crates.io. The `trunks` crate there is an unrelated project, so `cargo install trunks` installs the wrong tool. Install from GitHub Releases, from source (`cargo install --git`) or from a container image.
 - OIDC for MCP clients, organisations and declarative configuration are not part of this release.
 
-## Next steps
+<h2 id="next-steps">Next steps</h2>
 
 <Columns cols={2}>
   <Card title="Quickstart" icon="rocket" href="/trunks/quickstart">
@@ -149,7 +181,26 @@ claude mcp add --transport http trunks http://127.0.0.1:8080/mcp
   </Card>
 </Columns>
 
-## Links
+<h2 id="contribute">Contribute</h2>
+
+<Steps>
+  <Step title="Fork and clone">
+    Fork [`websublime/trunks`](https://github.com/websublime/trunks) and clone it. You need Rust 1.94 or newer. Node 22 is only needed to build the web console.
+  </Step>
+  <Step title="Create a branch">
+    Branch off `main` for your change.
+  </Step>
+  <Step title="Run the checks">
+    Run `cargo xtask ci`. It runs `cargo fmt --check`, `clippy -D warnings` and the tests, as CI does.
+  </Step>
+  <Step title="Open a pull request">
+    Push your branch and open a pull request against `main`.
+  </Step>
+</Steps>
+
+<Tip>`trunks usage <tool>` prints a tool's description and input parameters before you call it with `trunks invoke`.</Tip>
+
+<h2 id="links">Links</h2>
 
 - [GitHub repository](https://github.com/websublime/trunks)
 - [Release `v0.1.0-rc.2`](https://github.com/websublime/trunks/releases/tag/v0.1.0-rc.2)
@@ -157,30 +208,28 @@ claude mcp add --transport http trunks http://127.0.0.1:8080/mcp
 - [Container images](https://github.com/websublime/trunks/pkgs/container/trunks)
 - [License (MPL-2.0)](https://github.com/websublime/trunks/blob/v0.1.0-rc.2/LICENSE)
 
-<Panel>
-  <h3>Install</h3>
+</div>
 
-```bash
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/websublime/trunks/releases/download/v0.1.0-rc.2/trunks-installer.sh | sh
-```
+<div className="ws-toc" role="navigation" aria-label="On this page">
+  <p className="ws-label">On this page</p>
+  <a href="#overview">Overview</a>
+  <a href="#what-you-can-do">What you can do</a>
+  <a href="#web-console">Web console</a>
+  <a href="#install">Install</a>
+  <a href="#quick-example">Quick example</a>
+  <a href="#status">Status</a>
+  <a href="#next-steps">Next steps</a>
+  <a href="#contribute">Contribute</a>
+  <a href="#links">Links</a>
+</div>
 
-  <h3>Contribute</h3>
+</div>
 
-  <Steps>
-    <Step title="Fork and clone">
-      Fork [`websublime/trunks`](https://github.com/websublime/trunks) and clone it. You need Rust 1.94 or newer. Node 22 is only needed to build the web console.
-    </Step>
-    <Step title="Create a branch">
-      Branch off `main` for your change.
-    </Step>
-    <Step title="Run the checks">
-      Run `cargo xtask ci`. It runs `cargo fmt --check`, `clippy -D warnings` and the tests, as CI does.
-    </Step>
-    <Step title="Open a pull request">
-      Push your branch and open a pull request against `main`.
-    </Step>
-  </Steps>
+<div className="ws-footer" role="contentinfo">
+  <div className="ws-wrap ws-footer-inner">
+    <a className="ws-mono" href="/">← docs://websublime</a>
+    <a href="https://github.com/websublime/trunks">GitHub</a>
+  </div>
+</div>
 
-  <Tip>`trunks usage <tool>` prints a tool's description and input parameters before you call it with `trunks invoke`.</Tip>
-</Panel>
+</div>

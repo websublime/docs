@@ -34,11 +34,12 @@ Projects documented: delta, trunks, vite-open-api-server, unblock, workspace-too
 - **The code is the truth (D2).** When a project's README contradicts its code, document what the code does. Record the contradiction in `sync/reports/<slug>.md` (D6). Never edit the project repositories from here.
 - **Documented version (D5).** Latest stable release. Exceptions: trunks uses its latest RC tag, focus uses `main`, line-ui uses only what is published on npm.
 - **English only** on the site (D4).
-- **Styling (D9 to D11).**
-  - Every custom component declares `data-accent`.
+- **Styling (D11, D25).**
+  - Every custom component declares `data-accent` (and `data-gray="neutral"`).
   - No `line-` class prefixes on markup that is not from line.
   - Static parts are HTML in MDX; JSX is for interactive parts only.
-  - Chrome hex values come from the line `sand` scale.
+  - Hub and project overviews are full-width `mode: "custom"` pages; other pages use the standard layout.
+  - Mintlify drops `<nav>`, `<main>`, `<article>`, `<footer>` and SVG `<circle>` from MDX: use `<div role="…">` and `<path>` arcs. Write `{"$"}` for a literal `$` outside code (KaTeX).
 
 ## Checks
 
@@ -52,6 +53,7 @@ vale *.mdx */*.mdx                  # same Vale config as Mintlify's vale-spellc
 bun scripts/leak-lint.ts            # no internal material on published pages (D3)
 bun scripts/sync.ts --validate      # sync registry structure (D7)
 bun scripts/gen.ts --check          # generated pages match their sources (D24)
+bun scripts/nav.ts --check          # project navigation snippets match docs.json (D25)
 ```
 
 To keep the project pages current, follow `knowledge/sync.md` (`/docs-sync` in Claude Code).

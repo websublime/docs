@@ -2,26 +2,59 @@
 title: "workspace-tools"
 sidebarTitle: "Overview"
 description: "Changeset-based version management for JavaScript and TypeScript repositories and monorepos."
+mode: "custom"
 ---
 
-<div className="not-prose ws-hero" data-accent="cyan">
-  <div className="ws-hero-head">
-    <p className="ws-hero-tagline">Changesets, version bumps, upgrades and audits for JS/TS monorepos, in one Rust CLI.</p>
+import Nav from "/snippets/nav/workspace-tools.mdx";
+
+<div className="ws-page" data-accent="cyan" data-gray="neutral">
+
+<section className="ws-hero ws-hero-project" id="top">
+  <svg className="ws-lines" aria-hidden="true" viewBox="0 0 1440 460" preserveAspectRatio="none">
+    <g className="ws-lines-base">
+      <path className="ws-shade-11" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-12" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-9" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-11" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+    <g>
+      <path className="ws-pulse ws-t1 ws-shade-11" pathLength="1000" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t2" pathLength="1000" d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t3 ws-shade-12" pathLength="1000" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t4 ws-shade-9" pathLength="1000" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t6 ws-shade-11" pathLength="1000" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+  </svg>
+  <div className="ws-wrap ws-hero-inner">
+    <div className="ws-hero-copy">
+      <div className="ws-crumb" role="navigation" aria-label="Breadcrumb"><a href="/">docs://websublime</a> / <span>workspace-tools</span></div>
+      <div className="ws-title-row"><h1 className="ws-title">workspace-tools</h1></div>
+      <p className="ws-lede">Changeset-based version management for JavaScript and TypeScript repositories and monorepos.</p>
+      <div className="ws-stats">
+        <div className="ws-stat"><span className="ws-label">Version</span><span className="ws-stat-value">0.0.37 (CLI)</span></div>
+        <div className="ws-stat"><span className="ws-label">License</span><span className="ws-stat-value">MIT</span></div>
+        <div className="ws-stat"><span className="ws-label">Stack</span><span className="ws-stat-value">Rust · Node bindings</span></div>
+      </div>
+      <div className="ws-actions">
+        <a className="ws-btn ws-btn-accent" href="#install">Install</a>
+        <a className="ws-btn" href="https://github.com/websublime/workspace-tools">GitHub</a>
+      </div>
+    </div>
   </div>
-  <div className="ws-stats">
-    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">0.0.37 (CLI)</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">Rust · Node bindings</span></div>
-  </div>
-  <div className="ws-actions">
-    <a className="ws-button ws-button-solid" href="https://github.com/websublime/workspace-tools">GitHub</a>
-    <a className="ws-button" href="#install">Install</a>
-  </div>
-</div>
+</section>
+
+<div className="ws-wrap ws-doc">
+
+<Nav />
+
+<div className="ws-docbody prose dark:prose-invert" role="main">
+
+<h2 id="overview">Overview</h2>
 
 workspace-tools manages versions for JavaScript and TypeScript single-package repositories and monorepos. You record changes as changesets on your feature branches, then bump versions, write changelogs and tag releases from them. It ships as the `workspace` CLI, as Node.js bindings (`@websublime/workspace-tools`) and as Rust libraries. Use it locally or in CI/CD pipelines.
 
-## What you can do
+<h2 id="what-you-can-do">What you can do</h2>
 
 - Create, update, list and check changesets per branch with `workspace changeset`.
 - Preview and apply version bumps, snapshots and prereleases with `workspace bump`, and create git commits, tags and pushes.
@@ -30,7 +63,7 @@ workspace-tools manages versions for JavaScript and TypeScript single-package re
 - Run scripts or commands across packages, only on affected packages, or in parallel with `workspace execute`.
 - Get machine-readable output with `--format json` for CI pipelines.
 
-## Install
+<h2 id="install">Install</h2>
 
 <CodeGroup>
 ```bash Shell (macOS/Linux)
@@ -52,7 +85,7 @@ npm install @websublime/workspace-tools
 
 Prebuilt binaries are available for macOS (Apple Silicon and Intel), Linux (x86_64 GNU and musl, aarch64 GNU) and Windows (x86_64). Building from source with Cargo needs Rust 1.90.0 or later. Check the install with `workspace --version`.
 
-## Quick example
+<h2 id="quick-example">Quick example</h2>
 
 ```bash
 workspace init
@@ -64,7 +97,18 @@ workspace bump --dry-run
 workspace bump --execute --git-tag --git-push
 ```
 
-## Links
+<h2 id="contribute">Contribute</h2>
+
+<Steps>
+  <Step title="Open an issue">For non-trivial changes, discuss them in an [issue](https://github.com/websublime/workspace-tools/issues) first.</Step>
+  <Step title="Fork and branch">Fork the repository and create a branch. Keep one pull request per change.</Step>
+  <Step title="Run the checks">Run `cargo test --all-features --workspace` and `cargo clippy --all-targets --all-features --workspace`.</Step>
+  <Step title="Open a pull request">Follow the [contribution guidelines](https://github.com/websublime/workspace-tools/blob/sublime_cli_tools-v0.0.37/CONTRIBUTING.md).</Step>
+</Steps>
+
+<Tip>Add `--format json` to any command to get structured output for scripts and CI.</Tip>
+
+<h2 id="links">Links</h2>
 
 - [GitHub repository](https://github.com/websublime/workspace-tools)
 - [`sublime_cli_tools` on crates.io](https://crates.io/crates/sublime_cli_tools)
@@ -72,21 +116,25 @@ workspace bump --execute --git-tag --git-push
 - [CLI changelog](https://github.com/websublime/workspace-tools/blob/sublime_cli_tools-v0.0.37/crates/cli/CHANGELOG.md)
 - [Releases](https://github.com/websublime/workspace-tools/releases)
 
-<Panel>
-  <h3>Install</h3>
+</div>
 
-  ```bash
-  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/websublime/workspace-tools/releases/download/sublime_cli_tools-v0.0.37/sublime_cli_tools-installer.sh | sh
-  ```
+<div className="ws-toc" role="navigation" aria-label="On this page">
+  <p className="ws-label">On this page</p>
+  <a href="#overview">Overview</a>
+  <a href="#what-you-can-do">What you can do</a>
+  <a href="#install">Install</a>
+  <a href="#quick-example">Quick example</a>
+  <a href="#contribute">Contribute</a>
+  <a href="#links">Links</a>
+</div>
 
-  <h3>Contribute</h3>
+</div>
 
-  <Steps>
-    <Step title="Open an issue">For non-trivial changes, discuss them in an [issue](https://github.com/websublime/workspace-tools/issues) first.</Step>
-    <Step title="Fork and branch">Fork the repository and create a branch. Keep one pull request per change.</Step>
-    <Step title="Run the checks">Run `cargo test --all-features --workspace` and `cargo clippy --all-targets --all-features --workspace`.</Step>
-    <Step title="Open a pull request">Follow the [contribution guidelines](https://github.com/websublime/workspace-tools/blob/sublime_cli_tools-v0.0.37/CONTRIBUTING.md).</Step>
-  </Steps>
+<div className="ws-footer" role="contentinfo">
+  <div className="ws-wrap ws-footer-inner">
+    <a className="ws-mono" href="/">← docs://websublime</a>
+    <a href="https://github.com/websublime/workspace-tools">GitHub</a>
+  </div>
+</div>
 
-  <Tip>Add `--format json` to any command to get structured output for scripts and CI.</Tip>
-</Panel>
+</div>

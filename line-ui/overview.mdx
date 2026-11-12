@@ -2,28 +2,60 @@
 title: "line://ui"
 sidebarTitle: "Overview"
 description: "Headless UI primitives as native Web Components, with a CSS design system of tokens, colours and themes."
+mode: "custom"
 tag: "WIP"
 ---
 
-<div className="not-prose ws-hero" data-accent="lime">
-  <div className="ws-hero-head">
-    <span className="ws-badge ws-badge-wip">WIP</span>
-    <p className="ws-hero-tagline">Headless UI primitives as native Web Components, for any framework or plain HTML.</p>
+import Nav from "/snippets/nav/line-ui.mdx";
+
+<div className="ws-page" data-accent="lime" data-gray="neutral">
+
+<section className="ws-hero ws-hero-project" id="top">
+  <svg className="ws-lines" aria-hidden="true" viewBox="0 0 1440 460" preserveAspectRatio="none">
+    <g className="ws-lines-base">
+      <path className="ws-shade-11" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-12" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-9" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-11" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+    <g>
+      <path className="ws-pulse ws-t1 ws-shade-11" pathLength="1000" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t2" pathLength="1000" d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t3 ws-shade-12" pathLength="1000" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t4 ws-shade-9" pathLength="1000" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-t6 ws-shade-11" pathLength="1000" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+  </svg>
+  <div className="ws-wrap ws-hero-inner">
+    <div className="ws-hero-copy">
+      <div className="ws-crumb" role="navigation" aria-label="Breadcrumb"><a href="/">docs://websublime</a> / <span>line-ui</span></div>
+      <div className="ws-title-row"><h1 className="ws-title">line://ui</h1><span className="ws-badge ws-badge-lg ws-badge-wip">WIP</span></div>
+      <p className="ws-lede">Headless UI primitives as native Web Components, with a CSS design system of tokens, colours and themes.</p>
+      <div className="ws-stats">
+        <div className="ws-stat"><span className="ws-label">Version</span><span className="ws-stat-value">components 0.2.4</span></div>
+        <div className="ws-stat"><span className="ws-label">License</span><span className="ws-stat-value">MIT</span></div>
+        <div className="ws-stat"><span className="ws-label">Stack</span><span className="ws-stat-value">Web Components · Lit · Zag.js</span></div>
+      </div>
+      <div className="ws-actions">
+        <a className="ws-btn ws-btn-accent" href="#install">Install</a>
+        <a className="ws-btn" href="https://github.com/websublime/line-ui">GitHub</a>
+      </div>
+    </div>
   </div>
-  <div className="ws-stats">
-    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">components 0.2.4</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">Web Components · Lit · Zag.js</span></div>
-  </div>
-  <div className="ws-actions">
-    <a className="ws-button ws-button-solid" href="https://github.com/websublime/line-ui">GitHub</a>
-    <a className="ws-button" href="#install">Install</a>
-  </div>
-</div>
+</section>
+
+<div className="ws-wrap ws-doc">
+
+<Nav />
+
+<div className="ws-docbody prose dark:prose-invert" role="main">
+
+<h2 id="overview">Overview</h2>
 
 line://ui is a set of headless UI primitives built as native Web Components with Lit, plus a CSS design system of tokens, colour palettes and themes. You style components through `::part()` and `--line-*` custom properties, so they work in any framework or in plain HTML. It is for frontend developers who want accessible building blocks. Components ship themed defaults, and you can restyle every part of them. This documentation site itself is styled with `line-tokens`, `line-colors` and `line-themes`.
 
-## What you can do
+<h2 id="what-you-can-do">What you can do</h2>
 
 - Load global design tokens (typography, sizing, radii, motion, layouts and more) from `@websublime/line-tokens`, all inside one `line` cascade layer.
 - Pick from 31 colour palettes in `@websublime/line-colors`, with light and dark scales.
@@ -34,7 +66,7 @@ line://ui is a set of headless UI primitives built as native Web Components with
 
 More components are on the way.
 
-## Install
+<h2 id="install">Install</h2>
 
 Install the CSS design system, then the components you need.
 
@@ -50,7 +82,7 @@ npm install @websublime/line-tokens @websublime/line-colors @websublime/line-the
 
 </CodeGroup>
 
-## Quick example
+<h2 id="quick-example">Quick example</h2>
 
 Import the CSS once in your global stylesheet. Every hue you reference must be imported.
 
@@ -81,7 +113,7 @@ import '@websublime/line-components/button';
 </html>
 ```
 
-## Status
+<h2 id="status">Status</h2>
 
 line://ui is a work in progress. These pages document the versions published on npm:
 
@@ -99,7 +131,26 @@ line://ui is a work in progress. These pages document the versions published on 
 - **Works:** the tokens, colours and themes; the `button`, `stack` and `separator` components; the core base classes; the Lucide and Phosphor icon resolvers.
 - **Not yet:** the root entry of `@websublime/line-components` registers nothing, so you import each component by its subpath. More components are on the way.
 
-## Links
+<h2 id="contribute">Contribute</h2>
+
+<Steps>
+  <Step title="Fork and clone">
+    Fork [websublime/line-ui](https://github.com/websublime/line-ui), clone it and run `bun install`. The repo needs Bun 1.4.3 or later.
+  </Step>
+  <Step title="Create a branch">
+    Branch off `main` and make your change.
+  </Step>
+  <Step title="Run the checks">
+    Run `bun run lint`, `bun run build` and `bun run test`, then add a changeset with `bun run changeset`.
+  </Step>
+  <Step title="Open a pull request">
+    Push your branch and open a pull request against `main`.
+  </Step>
+</Steps>
+
+<Tip>Your own CSS outside any `@layer` always beats line://ui styles, because every rule of the design system sits in the `line` layer.</Tip>
+
+<h2 id="links">Links</h2>
 
 - [GitHub](https://github.com/websublime/line-ui)
 - [npm: `@websublime/line-components`](https://www.npmjs.com/package/@websublime/line-components)
@@ -107,29 +158,26 @@ line://ui is a work in progress. These pages document the versions published on 
 - [Storybook](https://line-ui-storybook.websublime.com)
 - [line://ui site](https://line-ui.websublime.com)
 
-<Panel>
-  <h3>Install</h3>
+</div>
 
-  ```sh
-  bun add @websublime/line-tokens @websublime/line-colors @websublime/line-themes @websublime/line-components
-  ```
+<div className="ws-toc" role="navigation" aria-label="On this page">
+  <p className="ws-label">On this page</p>
+  <a href="#overview">Overview</a>
+  <a href="#what-you-can-do">What you can do</a>
+  <a href="#install">Install</a>
+  <a href="#quick-example">Quick example</a>
+  <a href="#status">Status</a>
+  <a href="#contribute">Contribute</a>
+  <a href="#links">Links</a>
+</div>
 
-  <h3>Contribute</h3>
+</div>
 
-  <Steps>
-    <Step title="Fork and clone">
-      Fork [websublime/line-ui](https://github.com/websublime/line-ui), clone it and run `bun install`. The repo needs Bun 1.4.3 or later.
-    </Step>
-    <Step title="Create a branch">
-      Branch off `main` and make your change.
-    </Step>
-    <Step title="Run the checks">
-      Run `bun run lint`, `bun run build` and `bun run test`, then add a changeset with `bun run changeset`.
-    </Step>
-    <Step title="Open a pull request">
-      Push your branch and open a pull request against `main`.
-    </Step>
-  </Steps>
+<div className="ws-footer" role="contentinfo">
+  <div className="ws-wrap ws-footer-inner">
+    <a className="ws-mono" href="/">← docs://websublime</a>
+    <a href="https://github.com/websublime/line-ui">GitHub</a>
+  </div>
+</div>
 
-  <Tip>Your own CSS outside any `@layer` always beats line://ui styles, because every rule of the design system sits in the `line` layer.</Tip>
-</Panel>
+</div>
