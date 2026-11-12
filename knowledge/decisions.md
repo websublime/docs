@@ -275,7 +275,7 @@ Agents and humans read it before they change anything in this repository.
 - **Decision:**
   1. **Overview pages.** Every project gets a minimal Overview page now, at `<slug>/overview`, written from its sources at the D5 ref. The page covers identity, install, a quick example when verified, status for RC and WIP projects, and links. This means every `navigation.products` entry exists from the start. Fuller pages arrive with each project's sync intent.
   2. **Featured project:** the hub features **trunks**.
-  3. **Logo:** the `websublime` wordmark (`logo/websublime-black.svg` and `logo/websublime-white.svg`, from `websublime-site/design/Logo/`). The favicon is the `ws` mark (`logo/ws-black.svg` and `logo/ws-white.svg`).
+  3. **Logo:** the `websublime` wordmark (`logo/websublime-black.svg` and `logo/websublime-white.svg`, from `websublime-site/design/Logo/`). The favicon is the `ws` mark (`logo/ws-black.svg` and `logo/ws-white.svg`). The white variants originally had a dark `#242320` background plate and border rectangle (Sketch `Fill-1` and `Stroke-2`). Both were removed from the copies, so the mark sits on the site's own dark background.
   4. **Stats:** heroes and cards show static data for now: version, license and stack. Stars and downloads come with the sync tooling.
   5. **Generated assets:** `scripts/line-ui.mjs` copies the pinned stylesheets (`scripts/line-ui.versions.json`) into `styles/line-*.css` and writes `docs.json` `colors`/`background` from the sand scale:
      - `primary` = sand-12 light;
