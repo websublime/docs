@@ -1,0 +1,92 @@
+---
+title: "workspace-tools"
+sidebarTitle: "Overview"
+description: "Changeset-based version management for JavaScript and TypeScript repositories and monorepos."
+---
+
+<div className="not-prose ws-hero" data-accent="cyan">
+  <div className="ws-hero-head">
+    <p className="ws-hero-tagline">Changesets, version bumps, upgrades and audits for JS/TS monorepos, in one Rust CLI.</p>
+  </div>
+  <div className="ws-stats">
+    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">0.0.37 (CLI)</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">Rust · Node bindings</span></div>
+  </div>
+  <div className="ws-actions">
+    <a className="ws-button ws-button-solid" href="https://github.com/websublime/workspace-tools">GitHub</a>
+    <a className="ws-button" href="#install">Install</a>
+  </div>
+</div>
+
+workspace-tools manages versions for JavaScript and TypeScript single-package repositories and monorepos. You record changes as changesets on your feature branches, then bump versions, write changelogs and tag releases from them. It ships as the `workspace` CLI, as Node.js bindings (`@websublime/workspace-tools`) and as Rust libraries. Use it locally or in CI/CD pipelines.
+
+## What you can do
+
+- Create, update, list and check changesets per branch with `workspace changeset`.
+- Preview and apply version bumps, snapshots and prereleases with `workspace bump`, and create git commits, tags and pushes.
+- Check for dependency upgrades, apply them, and restore backups with `workspace upgrade`.
+- Audit project health (upgrades, dependencies, version consistency, breaking changes) with `workspace audit`.
+- Run scripts or commands across packages, only on affected packages, or in parallel with `workspace execute`.
+- Get machine-readable output with `--format json` for CI pipelines.
+
+## Install
+
+<CodeGroup>
+```bash Shell (macOS/Linux)
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/websublime/workspace-tools/releases/download/sublime_cli_tools-v0.0.37/sublime_cli_tools-installer.sh | sh
+```
+
+```powershell PowerShell (Windows)
+powershell -ExecutionPolicy ByPass -c "irm https://github.com/websublime/workspace-tools/releases/download/sublime_cli_tools-v0.0.37/sublime_cli_tools-installer.ps1 | iex"
+```
+
+```bash Cargo
+cargo install sublime_cli_tools --version 0.0.37
+```
+
+```bash Node bindings
+npm install @websublime/workspace-tools
+```
+</CodeGroup>
+
+Prebuilt binaries are available for macOS (Apple Silicon and Intel), Linux (x86_64 GNU and musl, aarch64 GNU) and Windows (x86_64). Building from source with Cargo needs Rust 1.90.0 or later. Check the install with `workspace --version`.
+
+## Quick example
+
+```bash
+workspace init
+git checkout -b feature/new-api
+workspace changeset create
+# ...edit and commit...
+workspace changeset update
+workspace bump --dry-run
+workspace bump --execute --git-tag --git-push
+```
+
+## Links
+
+- [GitHub repository](https://github.com/websublime/workspace-tools)
+- [`sublime_cli_tools` on crates.io](https://crates.io/crates/sublime_cli_tools)
+- [`@websublime/workspace-tools` on npm](https://www.npmjs.com/package/@websublime/workspace-tools)
+- [CLI changelog](https://github.com/websublime/workspace-tools/blob/sublime_cli_tools-v0.0.37/crates/cli/CHANGELOG.md)
+- [Releases](https://github.com/websublime/workspace-tools/releases)
+
+<Panel>
+  <h3>Install</h3>
+
+  ```bash
+  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/websublime/workspace-tools/releases/download/sublime_cli_tools-v0.0.37/sublime_cli_tools-installer.sh | sh
+  ```
+
+  <h3>Contribute</h3>
+
+  <Steps>
+    <Step title="Open an issue">For non-trivial changes, discuss them in an [issue](https://github.com/websublime/workspace-tools/issues) first.</Step>
+    <Step title="Fork and branch">Fork the repository and create a branch. Keep one pull request per change.</Step>
+    <Step title="Run the checks">Run `cargo test --all-features --workspace` and `cargo clippy --all-targets --all-features --workspace`.</Step>
+    <Step title="Open a pull request">Follow the [contribution guidelines](https://github.com/websublime/workspace-tools/blob/sublime_cli_tools-v0.0.37/CONTRIBUTING.md).</Step>
+  </Steps>
+
+  <Tip>Add `--format json` to any command to get structured output for scripts and CI.</Tip>
+</Panel>

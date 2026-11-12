@@ -1,0 +1,78 @@
+---
+title: "delta://"
+sidebarTitle: "Overview"
+description: "Typed JSON model diffing for TypeScript: diff, patch, unpatch, sparse snapshots and RFC 6902 export."
+---
+
+<div className="not-prose ws-hero" data-accent="indigo">
+  <div className="ws-hero-head">
+    <p className="ws-hero-tagline">Diff any two JSON values into typed operations, then patch, reverse or export them.</p>
+  </div>
+  <div className="ws-stats">
+    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">0.2.0</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">TypeScript · ESM</span></div>
+  </div>
+  <div className="ws-actions">
+    <a className="ws-button ws-button-solid" href="https://github.com/websublime/delta">GitHub</a>
+    <a className="ws-button" href="#install">Install</a>
+  </div>
+</div>
+
+`@websublime/delta` is a small TypeScript library that compares two JSON values and returns a typed diff with JSON Pointer paths. You can apply the diff forward, reverse it, reduce it to a sparse object of changes, or export it as a standard JSON Patch. Use it for PATCH payloads, audit logs and form dirty tracking.
+
+## What you can do
+
+- Diff any two JSON values with `diff()` and get typed `add`, `remove`, `replace` and `move` operations with RFC 6901 paths.
+- Apply a diff with `patch()` and reverse it with `unpatch()`. Neither function mutates its inputs.
+- Track array items by identity across reorders with the `arrayIdentity` option. Moved items carry a `nestedDiff` of their field changes.
+- Extract only what changed with `snapshot()`. Removed keys appear as `null`.
+- Export a diff as an RFC 6902 JSON Patch with `toRFC6902()` or `toRFC6902JSON()`.
+- Catch typed `DeltaError` failures, such as circular references or malformed diff results.
+
+## Install
+
+```bash
+npm install @websublime/delta
+```
+
+The package is ESM only and needs Node.js 18 or later. It has no runtime dependencies.
+
+## Quick example
+
+```ts
+import { diff, patch, unpatch, snapshot } from '@websublime/delta'
+
+const before = { name: 'Alice', age: 30 }
+const after = { name: 'Bob', age: 30 }
+
+const result = diff(before, after)
+
+patch(before, result)   // { name: 'Bob', age: 30 }
+unpatch(after, result)  // { name: 'Alice', age: 30 }
+snapshot(result)        // { name: 'Bob' }
+```
+
+## Links
+
+- [GitHub repository](https://github.com/websublime/delta)
+- [npm package](https://www.npmjs.com/package/@websublime/delta)
+- [Changelog at 0.2.0](https://github.com/websublime/delta/blob/%40websublime%2Fdelta%400.2.0/CHANGELOG.md)
+- [README at 0.2.0](https://github.com/websublime/delta/blob/%40websublime%2Fdelta%400.2.0/README.md)
+
+<Panel>
+  <h3>Install</h3>
+
+  ```bash
+  npm install @websublime/delta
+  ```
+
+  <h3>Contribute</h3>
+  <Steps>
+    <Step title="Fork and clone">Fork [websublime/delta](https://github.com/websublime/delta), clone your fork and run `npm install`.</Step>
+    <Step title="Create a branch">Create a feature branch from `main` for your change.</Step>
+    <Step title="Run the checks">Run `npm run verify`. It runs Biome lint, `tsc --noEmit` and the Vitest suite.</Step>
+    <Step title="Open a pull request">Push your branch and open a pull request against `main`. CI runs the same checks.</Step>
+  </Steps>
+  <Tip>Pass `arrayIdentity: 'id'` when your array items have stable ids. You get moves instead of noisy remove-and-add pairs.</Tip>
+</Panel>

@@ -1,0 +1,121 @@
+---
+title: "unblock"
+sidebarTitle: "Overview"
+description: "A local-first, dependency-aware issue tracker that AI agents drive over MCP, with atomic multi-agent claims."
+tag: "WIP"
+---
+
+<div className="not-prose ws-hero" data-accent="orange">
+  <div className="ws-hero-head">
+    <span className="ws-badge ws-badge-wip">WIP</span>
+    <p className="ws-hero-tagline">Agent-first issue tracker: a local, dependency-aware issue store your agents drive over MCP.</p>
+  </div>
+  <div className="ws-stats">
+    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">1.0.2</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT OR Apache-2.0</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">Rust · MCP · SQLite</span></div>
+  </div>
+  <div className="ws-actions">
+    <a className="ws-button ws-button-solid" href="https://github.com/websublime/unblock">GitHub</a>
+    <a className="ws-button" href="#install">Install</a>
+  </div>
+</div>
+
+unblock is the issue store an agent swarm coordinates through. Issues, dependencies and atomic claims live in one local SQLite file, with no server, no account and no network. Every domain feature is a Model Context Protocol (MCP) tool, resource or prompt over stdio; the `unblock` binary only handles lifecycle and operations. It is for developers who wire AI agents such as Claude Code, Claude Desktop, VS Code or Cursor to a shared work queue.
+
+## What you can do
+
+- Create, update, close, reopen, delete and restore issues through the `issue` MCP tool, including bulk creation from markdown with `create_bulk`.
+- Claim work atomically with the `claim` tool: it sets the assignee and moves the issue to `in_progress` in one step, so two agents never grab the same issue.
+- Track dependencies with the `dep` tool (`add`, `remove`, `list`, `tree`, `cycles`, `graph`) and ask for unblocked work with `query` (`ready`, `blocked`, `search`, `stale` and more).
+- Export and import issues as git-diffable JSONL, or import a `bd` workspace once, with the `sync` tool.
+- Discover the contract at runtime through the `unblock://capabilities` and `unblock://schema` resources, and use the `triage`, `plan_next_work` and `close_with_suggestions` prompts.
+- Manage the workspace from the CLI: `init`, `agents`, `mcp`, `migrate`, `doctor`, `version` and `update`, with stable exit codes from 0 to 8.
+
+## Install
+
+Prebuilt installers for release `v1.0.2` cover Linux (x86_64, aarch64, glibc), macOS (x86_64, aarch64) and Windows (x86_64). The `unblock` crate on crates.io is an unrelated project, so `cargo install unblock` installs the wrong tool. Use the release installers or build from source.
+
+<CodeGroup>
+```sh Shell (Linux, macOS)
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/websublime/unblock/releases/download/v1.0.2/unblock-cli-installer.sh | sh
+```
+
+```powershell PowerShell (Windows)
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/websublime/unblock/releases/download/v1.0.2/unblock-cli-installer.ps1 | iex"
+```
+
+```sh From source
+git clone --branch v1.0.2 https://github.com/websublime/unblock.git
+cd unblock
+cargo build --release   # Rust 1.96, binary at target/release/unblock
+```
+</CodeGroup>
+
+The installer adds `unblock` to your `PATH` through your shell profile. Open a new terminal before you run it. The installer files are named `unblock-cli-*`, but the installed binary is `unblock`.
+
+## Quick example
+
+Scaffold a workspace in your project root, then write the agent wiring block into `AGENTS.md`:
+
+```sh
+unblock init --prefix myproj
+unblock agents
+```
+
+Register the stdio server with Claude Code in `.mcp.json` at the repository root. unblock finds the workspace through `CLAUDE_PROJECT_DIR` or by walking up from the working directory, so the file needs no absolute path:
+
+```json .mcp.json
+{
+  "mcpServers": {
+    "unblock": {
+      "command": "unblock",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+## Status
+
+unblock is marked WIP on this site. At `v1.0.2`:
+
+- Local mode works: one embedded SQLite file, MCP contract `unblock.mcp.v1.10` with 8 tools, 5 resources and 3 prompts.
+- Remote mode (one shared database for a team) is not in any shipped binary.
+- The `remote` settings, `UNBLOCK_REMOTE_URL` and `UNBLOCK_AUTH_TOKEN` are reserved and have no effect.
+- `UNBLOCK_JSONL` and the `jsonl_export` setting are accepted, but nothing reads them yet.
+- The `agent_name`, `harness` and `model` attribution fields are accepted and discarded.
+
+## Links
+
+- [GitHub repository](https://github.com/websublime/unblock)
+- [Release v1.0.2](https://github.com/websublime/unblock/releases/tag/v1.0.2) (installers and checksums)
+- [README at v1.0.2](https://github.com/websublime/unblock/blob/v1.0.2/README.md)
+- [License: MIT](https://github.com/websublime/unblock/blob/v1.0.2/LICENSE-MIT) and [Apache-2.0](https://github.com/websublime/unblock/blob/v1.0.2/LICENSE-APACHE)
+
+<Panel>
+  <h3>Install</h3>
+
+  ```sh
+  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/websublime/unblock/releases/download/v1.0.2/unblock-cli-installer.sh | sh
+  ```
+
+  <h3>Contribute</h3>
+
+  <Steps>
+    <Step title="Fork and clone">
+      Fork [websublime/unblock](https://github.com/websublime/unblock) and clone your fork. The toolchain is pinned to Rust 1.96 in `rust-toolchain.toml`.
+    </Step>
+    <Step title="Create a branch">
+      Branch off `main` for your change.
+    </Step>
+    <Step title="Run the checks">
+      Run what CI runs: `cargo fmt --all --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings` and `cargo test --workspace --locked`.
+    </Step>
+    <Step title="Open a pull request">
+      Push your branch and open a pull request against `main`. Contributions are dual licensed under MIT OR Apache-2.0.
+    </Step>
+  </Steps>
+
+  <Tip>Run `unblock agents` again after every upgrade. The block it writes carries the binary's contract id.</Tip>
+</Panel>

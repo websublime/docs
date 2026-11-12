@@ -16,5 +16,4 @@ These pieces are described by the decisions but do not exist yet. Each one arriv
 
 - `sync/registry.yaml`, `sync/reports/` and the local sync command (D7, D6);
 - the leak lint for internal material (D3);
-- the `docs.json` restructure, the hub, project pages and styles (D9 to D12);
-- removal of the Mintlify starter template content.
+- full project pages beyond each Overview (one sync intent per project).

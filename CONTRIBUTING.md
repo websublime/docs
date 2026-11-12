@@ -1,34 +1,15 @@
-> **Customize this file**: Tailor this template to your project by noting specific contribution types you're looking for, adding a Code of Conduct, or adjusting the writing guidelines to match your style.
+# Contributing
 
-# Contribute to the documentation
+Thank you for helping improve the websublime docs.
 
-Thank you for your interest in contributing to our documentation! This guide will help you get started.
+1. **Open an intent.** Use the **Intent** issue template to describe what you want to change and why. A maintainer confirms the open choices before work starts.
+2. **Open a pull request.** Branch from `main`, keep the change limited to the intent, and fill in the pull request checklist.
+3. **Keep CI green.** `mint validate`, `mint broken-links` and the line://ui asset check must pass. Run them locally first:
+   ```bash
+   npx mint@4.3.19 validate
+   npx mint@4.3.19 broken-links
+   node scripts/line-ui.mjs --check
+   ```
+4. **Review and merge.** A maintainer reviews the change and merges it.
 
-## How to contribute
-
-### Option 1: Edit directly on GitHub
-
-1. Navigate to the page you want to edit
-2. Click the "Edit this file" button (the pencil icon)
-3. Make your changes and submit a pull request
-
-### Option 2: Local development
-
-1. Fork and clone this repository
-2. Install the Mintlify CLI: `npm i -g mint`
-3. Create a branch for your changes
-4. Make changes
-5. Navigate to the docs directory and run `mint dev`
-6. Preview your changes at `http://localhost:3000`
-7. Commit your changes and submit a pull request
-
-For more details on local development, see our [development guide](development.mdx).
-
-## Writing guidelines
-
-- **Use active voice**: "Run the command" not "The command should be run"
-- **Address the reader directly**: Use "you" instead of "the user"
-- **Keep sentences concise**: Aim for one idea per sentence
-- **Lead with the goal**: Start instructions with what the user wants to accomplish
-- **Use consistent terminology**: Don't alternate between synonyms for the same concept
-- **Include examples**: Show, don't just tell
+The full process and the decisions behind the site are in [`knowledge/`](knowledge/README.md). Pages describe each project's latest stable release, in English, from the project's own sources.

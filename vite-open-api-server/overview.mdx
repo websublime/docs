@@ -1,0 +1,119 @@
+---
+title: "vite-open-api-server"
+sidebarTitle: "Overview"
+description: "Vite plugin that runs a local mock server from your OpenAPI spec, with handlers, seeds and DevTools."
+---
+
+<div className="not-prose ws-hero" data-accent="purple">
+  <div className="ws-hero-head">
+    <p className="ws-hero-tagline">A local OpenAPI mock server inside your Vite dev server.</p>
+  </div>
+  <div className="ws-stats">
+    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">0.23.3</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT</span></div>
+    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">TypeScript · Vite · Hono</span></div>
+  </div>
+  <div className="ws-actions">
+    <a className="ws-button ws-button-solid" href="https://github.com/websublime/vite-open-api-server">GitHub</a>
+    <a className="ws-button" href="#install">Install</a>
+  </div>
+</div>
+
+`@websublime/vite-plugin-open-api-server` is a Vite plugin that starts a mock server from an OpenAPI spec and proxies your API path to it. It is for frontend developers who want to build against an API before the backend is ready, or without running it.
+
+## What you can do
+
+- Serve every operation in an OpenAPI 2.0 or 3.x spec, from a local file or a URL, in YAML or JSON.
+- Get realistic responses generated from your schemas with Faker.js.
+- Override responses per `operationId` with `defineHandlers()` in `*.handlers.ts` files.
+- Fill the in-memory store with consistent data using `defineSeeds()` in `*.seeds.ts` files.
+- Edit handlers and seeds and see them reload without restarting Vite.
+- Inspect routes, the request timeline, store models and error simulations in the DevTools app, also available as a Vue DevTools tab.
+
+## Install
+
+The plugin supports Vite 5, 6 and 7 and needs Node.js `^20.19.0` or `>=22.12.0`.
+
+<CodeGroup>
+```bash pnpm
+pnpm add -D @websublime/vite-plugin-open-api-server
+```
+
+```bash npm
+npm install -D @websublime/vite-plugin-open-api-server
+```
+
+```bash yarn
+yarn add -D @websublime/vite-plugin-open-api-server
+```
+</CodeGroup>
+
+`vue` is a peer dependency of the package.
+
+## Quick example
+
+Add the plugin to `vite.config.ts`:
+
+```typescript vite.config.ts
+import { defineConfig } from 'vite';
+import { openApiServer } from '@websublime/vite-plugin-open-api-server';
+
+export default defineConfig({
+  plugins: [
+    openApiServer({
+      spec: './openapi/petstore.yaml',
+      port: 4000,
+      proxyPath: '/api/v3',
+      handlersDir: './mocks/handlers',
+    }),
+  ],
+});
+```
+
+Requests to `/api/v3/*` now go to the mock server on port `4000`. To override one operation, add a handler file:
+
+```typescript mocks/handlers/pets.handlers.ts
+import { defineHandlers } from '@websublime/vite-plugin-open-api-server';
+
+export default defineHandlers({
+  getPetById: ({ req, store }) => {
+    const pet = store.get('Pet', Number.parseInt(req.params.petId, 10));
+    if (!pet) {
+      return { type: 'status', status: 404, data: { message: 'Pet not found' } };
+    }
+    return { type: 'raw', data: pet };
+  },
+});
+```
+
+## Links
+
+- [GitHub repository](https://github.com/websublime/vite-open-api-server)
+- [npm package](https://www.npmjs.com/package/@websublime/vite-plugin-open-api-server)
+- [Changelog at 0.23.3](https://github.com/websublime/vite-open-api-server/blob/%40websublime%2Fvite-plugin-open-api-server%400.23.3/packages/server/CHANGELOG.md)
+- [README at 0.23.3](https://github.com/websublime/vite-open-api-server/blob/%40websublime%2Fvite-plugin-open-api-server%400.23.3/README.md)
+
+<Panel>
+  <h3>Install</h3>
+
+  ```bash
+  pnpm add -D @websublime/vite-plugin-open-api-server
+  ```
+
+  <h3>Contribute</h3>
+  <Steps>
+    <Step title="Fork and set up">
+      Fork the repository, clone it and run `pnpm install`. You need Node.js `^20.19.0` or `>=22.12.0` and pnpm `9.15.0` or later.
+    </Step>
+    <Step title="Create a branch">
+      Use a prefix such as `feature/`, `fix/` or `docs/`, and write commits in Conventional Commits format.
+    </Step>
+    <Step title="Run the checks">
+      Run `pnpm lint`, `pnpm typecheck` and `pnpm test` before you push.
+    </Step>
+    <Step title="Open a pull request">
+      Follow the [contributing guide](https://github.com/websublime/vite-open-api-server/blob/%40websublime%2Fvite-plugin-open-api-server%400.23.3/CONTRIBUTING.md) and open a pull request.
+    </Step>
+  </Steps>
+  <Tip>Name handler and seed files with the plural suffix: `*.handlers.ts` and `*.seeds.ts`. The loader skips any other name.</Tip>
+</Panel>
