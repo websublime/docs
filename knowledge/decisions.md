@@ -287,3 +287,14 @@ Agents and humans read it before they change anything in this repository.
   6. **Custom markup:** classes use the `ws-` prefix and live in `styles/site.css`. Wrappers carry `not-prose`, so Mintlify typography leaves them alone. Status badges use the warning role for WIP and the info role for RC (D8).
   7. **Product order:** the Hub first, then the projects in alphabetical order.
 - **Why:** Miguel's choices on issue #3.
+
+## D21: Vale configuration lives in the repository
+
+- **Status:** accepted (2026-11-12, PR #4)
+- **Decision:**
+  - `.vale.ini` copies Mintlify's default Vale config with two changes:
+    - `StylesPath = .vale`, because `styles/` holds the site CSS;
+    - two vocabularies, `Mintlify` (Mintlify's default word list, copied) and `websublime`, in `.vale/config/vocabularies/<name>/accept.txt`.
+  - Correct technical terms flagged by `vale-spellcheck` go into the `websublime` vocabulary, one regex per line. Never reword correct content just to quiet the linter.
+  - Real misspellings get fixed in the page.
+- **Why:** On PR #4, `vale-spellcheck` reported 37 findings. All of them were correct technical terms: changesets, monorepos, Hono, Vitest, glibc, musl, Streamable and similar. Mintlify's built-in vocabulary cannot be extended without a repository config.

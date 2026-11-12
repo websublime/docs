@@ -61,6 +61,7 @@ flowchart LR
   npx mint@4.3.19 validate
   npx mint@4.3.19 broken-links
   node scripts/line-ui.mjs --check
+  vale *.mdx */*.mdx   # same config as the Mintlify vale-spellcheck check (D21)
   ```
 - **Visual changes:** check them in `mint dev`, in both light and dark mode, and attach screenshots to the pull request.
 - **Review:** a reviewer pass (human, or the `code-reviewer`/`reviewer` agent) checks the change against its intent and the decisions log. Fix every finding in the same pull request, then go back through CI.

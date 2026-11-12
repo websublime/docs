@@ -61,6 +61,12 @@ These facts were checked against Mintlify's own documentation (`https://www.mint
 
 On pull requests in `websublime/docs`, the Mintlify GitHub App reports `Mintlify Deployment` (a preview build), `Mintlify Validation - link-rot` and `Mintlify Validation - vale-spellcheck`. All three passed on PR #2 (2026-11-12).
 
+## Vale (`vale-spellcheck` check)
+
+- If the content root has a `.vale.ini`, the check uses it, along with any styles under its `StylesPath`. Without one, Mintlify's default config is used: Vale's base style, a `Mintlify` vocabulary, and `[*.mdx]` only, with JSX, `import`/`export` and `{…}` ignored.
+- **Findings fail the check.** On PR #4, 37 spelling findings made it fail.
+- This repository's config is described in D21.
+
 ## CLI (`mint` 4.3.19)
 
 | Command | Purpose |

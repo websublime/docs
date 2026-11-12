@@ -48,6 +48,7 @@ Run these locally before pushing; CI runs the same:
 npx mint@4.3.19 validate
 npx mint@4.3.19 broken-links
 node scripts/line-ui.mjs --check   # the line://ui styles and chrome colours match the pinned versions
+vale *.mdx */*.mdx                  # same Vale config as Mintlify's vale-spellcheck (D21)
 ```
 
 For visual changes, preview with `npx mint@4.3.19 dev` in both light and dark mode.
