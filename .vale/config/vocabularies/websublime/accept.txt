@@ -16,3 +16,5 @@ unpatch
 upstreams?
 Vitest
 xtask
+uv
+serverInfo

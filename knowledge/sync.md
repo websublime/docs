@@ -11,6 +11,7 @@ This is how an agent, or a human, keeps the project pages in step with each proj
 | `bun scripts/sync.ts --mark-synced <slug> [--at <sha>]` | Sets `lastSynced` to what the local checkout resolves each source's ref to, without fetching. For a single-source project, `--at <sha>` records that exact commit instead |
 | `bun scripts/sync.ts --validate` | Checks the registry structure and that every watched page exists (runs in CI) |
 | `bun scripts/leak-lint.ts` | Fails on internal material in published files (D3; runs in CI) |
+| `bun scripts/gen.ts [--project <slug>] [--check]` | Writes the generated pages declared in the registry from their source files at `lastSynced`. In CI, `--check` fails when a page differs (D24) |
 
 `sync/registry.yaml` describes each project:
 - `checkout`: the local clone, next to this repository;
@@ -42,7 +43,8 @@ The script rewrites the whole file when it marks a project as synced, so edit th
    5. When the pages state what the ref says, run `bun scripts/sync.ts --mark-synced <slug>` in the same pull request (process stage 5).
       - The command does not fetch, so it records what you read.
       - For a branch-tracked project such as focus, pass the commit you read: `--mark-synced focus --at <sha>`. The branch may have moved since then.
-4. **Check locally:** `bun scripts/leak-lint.ts`, `bun scripts/sync.ts --validate`, `npx mint@4.3.19 validate`, `npx mint@4.3.19 broken-links`, `vale *.mdx */*.mdx`. Then open the pull request and follow D15 to the end.
+   6. Then run `bun scripts/gen.ts --project <slug>`. Generated pages (D24) read their source at the new `lastSynced`. Never edit a generated page by hand.
+4. **Check locally:** `bun scripts/leak-lint.ts`, `bun scripts/sync.ts --validate`, `bun scripts/gen.ts --check`, `npx mint@4.3.19 validate`, `npx mint@4.3.19 broken-links`, `vale *.mdx */*.mdx`. Then open the pull request and follow D15 to the end.
 
 ## Leak-lint exceptions
 

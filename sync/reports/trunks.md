@@ -18,6 +18,14 @@ Places where this project's own documentation or help text disagrees with its co
 | 7 | `crates/trunks/src/main.rs:76` | `list` help: "servers, tools, prompts or resources" | `crates/trunks/src/commands/list.rs:16-47` has 9 subcommands (also groups, users, mcp-clients, teams, grants) | not on any page yet |
 | 8 | `docs/guide/README.md:27` | Design documents run from the first to the seventh | An eighth design document exists at the ref (`git ls-tree`) | not on any page yet |
 | 9 | `crates/trunks-dashboard/Cargo.toml:3` | "Embedded dashboard SPA assets" | Console is a static Astro site (`web/app/astro.config.mjs`) | not on any page yet |
+| 10 | `docs/guide/reference/configuration.md:45` | Setting an OIDC issuer in development mode is a start-up error | `crates/trunks/src/commands/start.rs:143-147` only logs a warning and starts | `trunks/guides/single-sign-on`, `trunks/reference/configuration` follow the code |
+| 11 | `docs/guide/reference/api.md:173` | Grants are enterprise-only and answer 403 in development mode | `crates/trunks-api/src/lib.rs:92` mounts the grants routes behind `require_admin` only; `require_enterprise` (lines 98, 104) covers users, `whoami`, clients and teams | `trunks/reference/http-api` follows the code |
+| 12 | `docs/guide/reference/api.md:93` | An unknown group returns `tool group not found: <name>` | `crates/trunks-api/src/mcp.rs:92,95` with `crates/trunks-core/src/error.rs:12` returns `tool group: <name> not found` | `trunks/reference/mcp-endpoints` follows the code |
+| 13 | `docs/guide/reference/api.md:37` | `/metrics` is Prometheus text format | `crates/trunks-api/src/routes/public.rs:47` sends `application/openmetrics-text; version=1.0.0` | `trunks/guides/operations`, `trunks/reference/http-api` follow the code |
+| 14 | `docker-compose.yaml:10`, `docker-compose.prod.yaml:12` | Use the `:latest-stdio` and `:latest` images | `.github/workflows/docker.yml:133-137` publishes `latest*` only for tags without `-`; neither tag exists at this release | `trunks/installation` warns to change the `image:` line |
+| 15 | `docs/guide/quickstart.md:28`, `README.md` | `cargo install --git …` installs Trunks | Without `--tag` it builds `main`, not the release | `trunks/installation` pins `--tag v0.1.0-rc.2` |
+| 16 | `docs/guide/quickstart.md` | The web console is served at `/` | Only release binaries and images embed it: `crates/trunks-dashboard/dist/` holds `.gitkeep` and is filled by the build setup (`.github/build-setup.yml`), so `cargo install --git` builds a binary without the console | `trunks/installation` explains it in a note |
+| 17 | `crates/trunks-types/src/names.rs:7` (comment) | Resource URIs use base64url without padding | `names.rs:14,180,205` use the standard alphabet without padding (`STANDARD_NO_PAD`) | `trunks/concepts/core-concepts`, `trunks/reference/mcp-endpoints` follow the code |
 
 ## Not reproduced at this ref
 

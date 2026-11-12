@@ -51,6 +51,7 @@ node scripts/line-ui.mjs --check   # the line://ui styles and chrome colours mat
 vale *.mdx */*.mdx                  # same Vale config as Mintlify's vale-spellcheck (D21)
 bun scripts/leak-lint.ts            # no internal material on published pages (D3)
 bun scripts/sync.ts --validate      # sync registry structure (D7)
+bun scripts/gen.ts --check          # generated pages match their sources (D24)
 ```
 
 To keep the project pages current, follow `knowledge/sync.md` (`/docs-sync` in Claude Code).

@@ -23,6 +23,7 @@ type Source = {
   ref: string;
   lastSynced: string;
   watch: Record<string, string[]>;
+  generated?: { page: string; generator: string; from: string; title: string; description: string }[];
 };
 type Project = {
   slug: string;
@@ -107,6 +108,11 @@ if (flag("--validate")) {
         if (!existsSync(join(root, `${page}.mdx`))) problems.push(`${at}: watched page ${page}.mdx does not exist`);
         if (!Array.isArray(globs) || !globs.length || globs.some((g) => typeof g !== "string" || !g))
           problems.push(`${at}: watch for ${page} must be a non-empty list of globs`);
+      }
+      for (const g of s.generated ?? []) {
+        if (!["markdown", "keep-a-changelog"].includes(g.generator)) problems.push(`${at}: unknown generator ${g.generator} for ${g.page}`);
+        if (!g.from || !g.title || !g.description) problems.push(`${at}: generated ${g.page} needs from, title and description`);
+        if (!watch[g.page]?.includes(g.from)) problems.push(`${at}: generated ${g.page} must be watched on its source ${g.from}`);
       }
     }
   }

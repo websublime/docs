@@ -1,0 +1,117 @@
+---
+title: "Tool groups"
+sidebarTitle: "Tool groups"
+description: "Publish a named selection of tools on its own MCP endpoint, to give an agent only the tools it needs."
+---
+
+A tool group is a named selection of tools with its own MCP endpoint. Use one to give an agent only the tools it needs, or to keep a client's tool list short.
+
+## Define a group
+
+Describe a group in a JSON file:
+
+```json triage.json
+{
+  "name": "triage",
+  "description": "Read issues, post comments",
+  "included_servers": ["jira"],
+  "included_tools": ["github__list_issues", "github__add_issue_comment"],
+  "excluded_tools": ["jira__delete_issue"]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `name` | Starts with a letter or digit, then letters, digits, `_`, `-`. |
+| `description` | Free text. |
+| `included_servers` | Every tool of these servers, including tools they gain later. |
+| `included_tools` | Individual tools, by full name (`<server>__<tool>`). |
+| `excluded_tools` | Removed from the result of the two lists above. Exclusion always wins. |
+
+The tools a group actually exposes are its **effective tools**: the included servers' tools plus the included tools, minus the excluded ones. Only tools that are currently enabled count.
+
+## Create a group
+
+```bash
+trunks create group -c triage.json
+```
+
+The command prints the stored definition, the group's endpoint and its effective tools. For a group of two tools from the [quickstart](/trunks/quickstart) server:
+
+```text
+Tool group math created.
+math
+  Only the arithmetic tools
+  included tools:   everything__echo, everything__get-sum
+  included servers: (none)
+  excluded tools:   (none)
+  MCP endpoint:     http://127.0.0.1:8080/v0/groups/math/mcp
+  effective tools (2):
+    everything__echo
+    everything__get-sum
+```
+
+Creation fails if an included tool or server doesn't exist (or the tool is disabled), or if the group would have no tools.
+
+## Use a group
+
+Point the MCP client at the group's endpoint instead of `/mcp`:
+
+```text
+http://127.0.0.1:8080/v0/groups/triage/mcp
+```
+
+The client sees and can call only the effective tools. A group endpoint lists no prompts and no resources. See [Connecting clients](/trunks/guides/connecting-clients) and [MCP endpoints](/trunks/reference/mcp-endpoints).
+
+From the CLI:
+
+```bash
+trunks list groups
+trunks get group triage
+trunks list tools --group triage
+trunks invoke github__list_issues --group triage --input '{"repo":"websublime/trunks"}'
+```
+
+### In the web console
+
+The console shows the same under **Tool groups**: each group's endpoint, its effective tools, and whether each tool comes from an included server or was included by name.
+
+Administrators can also create, change and delete groups there. Per server, tick **Whole server** (and clear the tools to leave out), or tick tools one by one. The form shows how many effective tools the selection has before you save.
+
+## Change or remove a group
+
+```bash
+trunks update group triage -c triage.json   # prints what changed
+trunks delete group triage
+```
+
+`update` replaces the whole definition with the file's contents. It ignores the `name` in the file.
+
+## When referenced tools or servers change
+
+A group stores names, not copies. If a tool it includes is disabled, or a server it includes is removed, the group keeps working with whatever is left, down to an empty tool list. It recovers by itself when the tool or server is back.
+
+## Groups and access in enterprise mode
+
+A group doesn't grant access by existing. An administrator grants it to a user or a team:
+
+```bash
+trunks grant --team support --group triage
+```
+
+Whoever holds that grant can use the group's effective tools, on the group endpoint and on `/mcp`, without access to the whole servers behind them. A grant on a group doesn't give access to prompts or resources. See [Enterprise mode](/trunks/guides/enterprise-mode).
+
+## REST API
+
+The CLI and console use these routes under `/api/v0`:
+
+| Method | Route | Purpose |
+|---|---|---|
+| `GET` | `/tool-groups` | List groups. |
+| `POST` | `/tool-groups` | Create a group. Returns the group and `streamable_http_endpoint`. |
+| `GET` | `/tool-groups/{name}` | Get a group and its endpoint. |
+| `PUT` | `/tool-groups/{name}` | Replace a group's definition. Returns what changed. |
+| `DELETE` | `/tool-groups/{name}` | Delete a group. |
+| `GET` | `/tool-groups/{name}/effective-tools` | List the group's effective tools. |
+
+See the [HTTP API reference](/trunks/reference/http-api) for authentication and payloads.

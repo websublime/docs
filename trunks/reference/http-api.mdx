@@ -1,0 +1,264 @@
+---
+title: "HTTP API reference"
+sidebarTitle: "HTTP API"
+description: "Every Trunks HTTP route: service endpoints, browser sign-in, the REST API under /api/v0 and the dashboard API."
+---
+
+Trunks serves three kinds of HTTP endpoints:
+
+- the MCP endpoints for MCP clients, described in [MCP endpoints](/trunks/reference/mcp-endpoints);
+- a REST API under `/api/v0`, which the CLI uses, plus a read-only dashboard API under `/api/dashboard` for the web console;
+- a few unauthenticated service endpoints.
+
+Paths, JSON shapes and error messages are stable within a major version. There is no OpenAPI document.
+
+## Conventions
+
+### Requests
+
+- Bodies are JSON (`Content-Type: application/json`), at most 4 MiB.
+- Tools and prompts are named `<server>__<name>`. Resources are `trunks://res/<server>/<encoded-uri>` URIs. See [Core concepts](/trunks/concepts/core-concepts).
+- Listings and lookups return only what the caller may use. Lists are returned whole: there is no pagination.
+
+### Authentication
+
+In **enterprise mode**, send `Authorization: Bearer <token>`.
+
+- The REST API and the dashboard API take a **user** token.
+- The MCP endpoints take an **MCP client** token.
+- Neither kind of token works on the other kind of endpoint.
+- The web console's session cookie works in place of a user token on the REST and dashboard APIs. See [Browser sign-in](#browser-sign-in).
+
+In **development mode**, no token is needed and every caller acts as an administrator.
+
+Until the server is initialized, the REST API, the dashboard API and the MCP endpoints answer 403 `server is not initialized`. A development server initializes itself at start-up. See [Modes and identities](/trunks/concepts/modes-and-identities).
+
+The **Who** column in the tables below uses these terms:
+
+| Who | Meaning |
+|---|---|
+| anyone | no authentication |
+| any user | any authenticated user; everyone in development mode |
+| admin | an administrator; everyone in development mode |
+| enterprise | enterprise mode only; development mode answers 403 `this request is only allowed in enterprise mode` |
+
+### Errors
+
+Errors are JSON: `{"error": "<message>"}`, sometimes with a machine-readable `"code"`.
+
+| Status | Meaning |
+|---|---|
+| 400 | Invalid input; the message says what. |
+| 401 | Missing or invalid token. |
+| 403 | Authenticated but not allowed; server not initialized; enterprise-only endpoint in development mode; cross-origin request with a session cookie. |
+| 404 | Not found, **or outside the caller's reach**. The two are indistinguishable on purpose. |
+| 413 | Body larger than 4 MiB. |
+| 500 | Failure reaching an upstream, or an internal error. The message carries the reason. |
+| 504 | The request, or an upstream, exceeded `TRUNKS_REQUEST_TIMEOUT_SEC` (`{"error":"request timed out"}`). |
+
+## Service endpoints
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/health` | anyone | `{"status":"ok"}` while the process is serving. |
+| `GET` | `/metadata` | anyone | `{"version": "<version>"}`. |
+| `GET` | `/metrics` | anyone | Metrics in the OpenMetrics text format, which Prometheus reads. Only when metrics are on (`TRUNKS_METRICS_ENABLED`). |
+| `POST` | `/init` | anyone | Initializes the server. See below. |
+
+`POST /init` with `{"mode":"enterprise"}` answers `{"status":"…","admin_access_token":"…"}` once. This is what [`trunks init-server`](/trunks/reference/cli#trunks-init-server) calls. Trunks never shows the token again. An already initialized server answers 400. So does a `mode` other than the one the server was started in.
+
+## Web console
+
+Any `GET` or `HEAD` outside the paths on this page serves a page or a file of the web console, which is embedded in the binary. The files are static and the same for everyone, so they need no authentication. Everything they display comes from the API, with the viewer's own session.
+
+- Pages are sent with a strict `Content-Security-Policy`: no inline script or style, no framing.
+- An unknown page answers 404 with the console's "page not found" page.
+- An unknown path under `/api`, `/auth`, `/mcp` or `/v0` answers 404 with no body.
+
+| Page | Shows |
+|---|---|
+| `/` | Overview. |
+| `/login/` | Sign-in. |
+| `/servers/`, `/servers/detail/?name=<server>` | Upstream servers; one server with its tools, prompts and resources (`&tab=prompts`, `&tab=resources`). |
+| `/servers/new/` | Register a server (admin). |
+| `/tools/`, `/prompts/`, `/resources/` | The catalog. `?server=<server>` and `?enabled=true` or `false` filter it. |
+| `/groups/`, `/groups/detail/?name=<group>` | Tool groups; one group with its endpoint and effective tools. |
+| `/groups/new/`, `/groups/edit/?name=<group>` | Create or change a tool group (admin). |
+| `/diagnostics/` | Configuration and failing upstreams (admin). |
+| `/clients/`, `/clients/new/` | MCP clients, and creating one (enterprise). |
+| `/users/`, `/access/` | Users and grants (enterprise, admin). |
+| `/teams/`, `/teams/detail/?name=<team>` | Teams and their members (enterprise). |
+| `/account/` | Who you are, what you can use, and through which grant (enterprise). |
+
+## Browser sign-in
+
+These endpoints serve the web console. They work before initialization too: `GET /auth/config` always answers, and the others answer 403 until the server runs in enterprise mode.
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/auth/config` | anyone | `{"mode", "login_required", "oidc"}`: what a sign-in page needs to know. `mode` is `null` before initialization. |
+| `GET` | `/auth/login?return_to=` | anyone, enterprise | Redirects to the OIDC provider. 404 when single sign-on is not configured. |
+| `GET` | `/auth/callback` | anyone, enterprise | The provider's redirect target. Sets the session cookie and redirects to `return_to`. |
+| `POST` | `/auth/token` | anyone, enterprise | Takes `{"access_token"}` (a user token). Answers `{"username","role"}` and sets a session cookie. |
+| `POST` | `/auth/logout` | anyone, enterprise | Ends the session. 204. |
+
+The session is an `HttpOnly`, `SameSite=Lax` cookie named `trunks_session`, valid for `TRUNKS_SESSION_TTL_HOURS`. It is `Secure` when the public URL starts with `https://`, or, without a public URL, when the request carries `X-Forwarded-Proto: https`.
+
+The REST and dashboard APIs accept the cookie in place of a bearer token. The MCP endpoints never accept it. A `POST`, `PUT` or `DELETE` authenticated by the cookie must carry an `Origin` header equal to the public URL or to the request's `Host`; otherwise it gets 403.
+
+See [Single sign-on](/trunks/guides/single-sign-on).
+
+## REST API
+
+The base path is `/api/v0`. All paths below are relative to it.
+
+### Registry reads
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/servers` | any user | `[Server]`. |
+| `GET` | `/tools?server=` | any user | `[Tool]`. `server` is optional; 404 when that server does not exist or is out of reach. |
+| `GET` | `/tool?name=` | any user | One `Tool`, by canonical name. |
+| `GET` | `/prompts?server=` | any user | `[Prompt]`. `server` is optional. |
+| `GET` | `/prompt?name=` | any user | One `Prompt`, by canonical name. |
+| `GET` | `/resources?server=` | any user | `[Resource]`. `server` is optional. |
+| `GET` | `/users/whoami` | any user, enterprise | `{"username", "role", "teams":[{"name","role"}], "access":{"all","servers":[],"tool_groups":[]}, "grants":[grant]}`. `grants` are your own grants and your teams'; `access` is derived from them. |
+
+The shapes:
+
+```text
+Server    {name, transport, enabled, description, session_mode,
+           url?, header_keys[]?, command?, args[]?, env_keys[]?, created_at?, updated_at?}
+Tool      {name, server, enabled, description, input_schema?, annotations?}
+Prompt    {name, server, enabled, description, arguments?}
+Resource  {uri, server, name, enabled, description, mime_type?, annotations?, meta?}
+ToolGroup {name, description, included_tools[], included_servers[], excluded_tools[]}
+```
+
+`transport` is `stdio` or `streamable_http`. `session_mode` is `stateless` or `stateful`. A `Server` never includes credentials, only the names of its headers and environment variables.
+
+### Invoke
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `POST` | `/tools/invoke` | any user | Calls a tool. Body: `{"name": "<server>__<tool>", …arguments}`. Answers the tool's result: `{"content":[…], "isError"?, "structuredContent"?}`. |
+| `POST` | `/prompts/render` | any user | Renders a prompt. Body: `{"name": "<server>__<prompt>", "arguments": {…}}`. Answers `{"description"?, "messages":[…]}`. |
+| `POST` | `/resources/get` | any user | Body: `{"uri": "trunks://…"}`. Answers the `Resource`. |
+| `POST` | `/resources/read` | any user | Body: `{"uri": "trunks://…"}`. Answers `{"contents":[…]}`. |
+
+In `POST /tools/invoke`, the tool's arguments sit next to `name` in the same object:
+
+```bash
+curl -s https://trunks.example.com/api/v0/tools/invoke \
+  -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"name":"everything__get-sum","a":2,"b":3}'
+```
+
+### Tool groups
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/tool-groups` | any user | `[ToolGroup]`. |
+| `GET` | `/tool-groups/{name}` | any user | The `ToolGroup` plus `streamable_http_endpoint`. |
+| `GET` | `/tool-groups/{name}/effective-tools` | any user | `[Tool]`: the tools the group resolves to. |
+| `POST` | `/tool-groups` | admin | Creates a group from a `ToolGroup`. 201, the group plus `streamable_http_endpoint`. |
+| `PUT` | `/tool-groups/{name}` | admin | Replaces a group. The body's `name` is ignored. Answers `{"name","old": ToolGroup,"new": ToolGroup}`. |
+| `DELETE` | `/tool-groups/{name}` | admin | 204, also when the group did not exist. |
+
+See [Tool groups](/trunks/guides/tool-groups).
+
+### Administration
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `POST` | `/servers?force=` | admin | Registers a server. 201 `{"server": Server}`, or 202 `{"authorization_required": {"session_id","authorization_url","expires_at"}}` when the upstream needs OAuth. `force=true` replaces a server of the same name. |
+| `POST` | `/upstream_oauth/sessions/{id}/complete` | admin | Body: `{"code","state"}`. Completes an OAuth registration. 201 `{"server": Server}`. |
+| `DELETE` | `/servers/{name}` | admin | Deregisters a server. 204. |
+| `POST` | `/servers/{name}/enable`, `/servers/{name}/disable` | admin | Answers `{"name", "tools_affected"?, "prompts_affected"?, "resources_affected"?}`. |
+| `POST` | `/tools/enable?entity=`, `/tools/disable?entity=` | admin | `entity` is a tool name, or a server name for all its tools. Answers `{"tools_affected":[…]}`. |
+| `POST` | `/prompts/enable?entity=`, `/prompts/disable?entity=` | admin | `entity` is a prompt name or a server name. Answers `{"prompts_affected":[…]}`. |
+| `POST` | `/resources/enable?entity=`, `/resources/disable?entity=` | admin | `entity` is a `trunks://` URI or a server name. Answers `{"resources_affected":[…]}`. |
+| `GET` | `/server_configs` | admin | `[server definition]`, **including credentials**. This is what [`trunks export`](/trunks/reference/cli#trunks-export) writes. |
+
+The server definition is the JSON that [`trunks register -c`](/trunks/reference/cli#trunks-register) accepts. See [Upstream servers](/trunks/guides/upstream-servers) for its fields.
+
+- Registration connects to the upstream first. If that fails, the answer is 500 with the reason, and nothing is stored.
+- When the upstream demands OAuth and the request has no `oauth_redirect_uri`, the answer is 400 with `"code":"upstream_oauth_required"`.
+
+### Access
+
+Grants are enterprise-only data, but the routes are admin routes: in development mode they work for everyone.
+
+A grant is `{"subject_kind": "user"|"team", "subject": "<name>", "target_kind": "server"|"tool_group", "target": "<name>"}`. The target `"*"` with `target_kind` `server` means every server.
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/grants?target_kind=&target=` | admin | `[grant]`. Both filters are optional. |
+| `POST` | `/grants` | admin | Adds a grant. 201, or 200 when it already existed. |
+| `DELETE` | `/grants` | admin | Removes the grant given as the body. 204. |
+| `GET` | `/servers/{name}/access` | admin | `[grant]` on that server. |
+| `GET` | `/tool-groups/{name}/access` | admin | `[grant]` on that group. |
+
+The subject must exist (404 otherwise). The target is a name and does not have to exist yet.
+
+### Identities
+
+Users and MCP clients exist in enterprise mode only. In development mode these routes answer 403.
+
+**Users**
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/users` | admin, enterprise | `[{"username","role"}]`. |
+| `POST` | `/users` | admin, enterprise | Body: `{"username", "access_token"?}`. 201 `{"username","role","access_token"}`. |
+| `PUT` | `/users/{username}` | admin, enterprise | Body: `{"access_token"?}`. Generates a new token when you omit it. Answers `{"username","role","access_token"}`. |
+| `DELETE` | `/users/{username}` | admin, enterprise | 204. Deleting the last administrator is refused with 400. |
+
+Tokens appear in a response only when they are created or replaced. A custom token has at least 8 characters and no whitespace.
+
+**MCP clients**
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/clients` | any user, enterprise | `[McpClient]`: all of them for an administrator; otherwise your own and your teams'. |
+| `POST` | `/clients` | any user, enterprise | Body: `{"name","description"?,"allow_list"?:[…],"access_token"?,"owner"?:{"kind","name"}}`. 201, the `McpClient` plus `access_token`. |
+| `PUT` | `/clients/{name}` | admin, owner, or maintainer of the owning team; enterprise | Body: `{"description"?,"allow_list"?,"access_token"?,"rotate_token"?}`. Only the given fields change. Answers the `McpClient`, plus `access_token` when it changed. |
+| `DELETE` | `/clients/{name}` | admin, owner, or maintainer of the owning team; enterprise | 204. |
+
+`McpClient` is `{name, description, allow_list[], owner?: {kind: "user"|"team", name}}`. `allow_list` holds server names or `"*"`.
+
+- A user who names no owner becomes the owner.
+- Naming a team as the owner requires being one of its maintainers.
+- Only an administrator can create a client without an owner.
+
+See [Enterprise mode](/trunks/guides/enterprise-mode) for how the owner and the allow list combine.
+
+### Teams
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/teams` | any user, enterprise | `[{"name","description"}]`. |
+| `GET` | `/teams/{name}` | any user, enterprise | `{"name","description","members":[{"username","role"}]}`. |
+| `POST` | `/teams` | admin, enterprise | Body: `{"name","description"?}`. 201, the team with its members. |
+| `PUT` | `/teams/{name}` | admin, enterprise | Body: `{"description"}`. Answers the team. |
+| `DELETE` | `/teams/{name}` | admin, enterprise | 204. Also deletes the team's memberships, grants and MCP clients. |
+| `POST` | `/teams/{name}/members` | admin or team maintainer, enterprise | Body: `{"username","role"?}`. `role` is `member` (default) or `maintainer`; an existing member's role is updated. Answers the team with its members. |
+| `DELETE` | `/teams/{name}/members/{username}` | admin or team maintainer, enterprise | 204. |
+
+## Dashboard API
+
+The base path is `/api/dashboard`. These are aggregated, read-only views for the web console. No response contains a credential: servers are described by their URL or command and by the *names* of their headers and environment variables.
+
+| Method | Path | Who | What it does |
+|---|---|---|---|
+| `GET` | `/overview` | any user | Counts and status. Includes `sessions` (open upstream sessions of the whole process) for administrators only. |
+| `GET` | `/servers`, `/servers/{name}` | any user | Servers; one server with its catalog. |
+| `GET` | `/tools`, `/prompts`, `/resources` | any user | The catalog. |
+| `GET` | `/tool-groups`, `/tool-groups/{name}` | any user | Tool groups; one group. |
+| `GET` | `/diagnostics` | admin | Database backend, listen address, allowed hosts, time limits, upstreams whose last connection failed (with the error), and OAuth authorizations still pending. |
+| `GET` | `/oauth/session/{id}` | admin | The `status` of an upstream authorization: `pending`, `completed`, `expired` or `unknown`. |
+| `GET` | `/oauth/callback?code=&state=` | anyone | Redirect URI of an upstream authorization started from the console. |
+
+Each view holds only what the caller may use, by the same rules as the REST API. A server or group outside your reach answers 404, like one that does not exist.
+
+`/oauth/callback` is the `oauth_redirect_uri` of a server registered from the console. The provider sends the browser there. It needs no authentication, because the `state` identifies the pending registration. It completes the registration and answers with a small HTML page that says whether it worked.

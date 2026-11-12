@@ -1,0 +1,139 @@
+---
+title: "Quickstart"
+sidebarTitle: "Quickstart"
+description: "Install Trunks, register one MCP server, call a tool through the gateway and connect your first MCP client."
+---
+
+This page walks you through a local, single-user setup. You start Trunks, register one MCP server, call a tool through the gateway and connect a client.
+
+<Warning>
+  This setup uses development mode, which has **no authentication**. Trunks listens on `127.0.0.1` only, so only your own machine can reach it. For a shared server, continue with [Enterprise mode](/trunks/guides/enterprise-mode) afterwards.
+</Warning>
+
+<Steps>
+  <Step title="Install Trunks">
+    Install the `v0.1.0-rc.2` release with the installer for your platform:
+
+    <CodeGroup>
+
+    ```bash macOS and Linux
+    curl --proto '=https' --tlsv1.2 -LsSf \
+      https://github.com/websublime/trunks/releases/download/v0.1.0-rc.2/trunks-installer.sh | sh
+    ```
+
+    ```powershell Windows
+    powershell -ExecutionPolicy Bypass -c "irm https://github.com/websublime/trunks/releases/download/v0.1.0-rc.2/trunks-installer.ps1 | iex"
+    ```
+
+    </CodeGroup>
+
+    There is one binary. `trunks start` is the server, and every other command is the management CLI. For release archives, building from source and container images, see [Installation](/trunks/installation).
+  </Step>
+
+  <Step title="Start the server">
+    ```bash
+    trunks start
+    ```
+
+    ```text
+    Trunks HTTP server listening on 127.0.0.1:8080
+    ```
+
+    Trunks stores its data in `trunks.db` (SQLite) in the current directory. The web console is at `http://127.0.0.1:8080/`. It shows the servers, tools, prompts, resources and tool groups that the gateway holds, and you can manage servers and tool groups there too. This guide uses the CLI.
+  </Step>
+
+  <Step title="Register an MCP server">
+    In another terminal, register a server that Trunks starts as a local process. This example uses the reference "everything" server, which needs Node.js:
+
+    ```bash
+    trunks register --name everything \
+      --command npx --arg -y --arg @modelcontextprotocol/server-everything \
+      --session-mode stateful
+    ```
+
+    ```text
+    Server everything registered successfully!
+
+    Tools (13):
+      everything__echo  Echoes back the input string
+      everything__get-sum  Returns the sum of two numbers
+      ...
+    ```
+
+    Trunks connected to the server, read its tools, prompts and resources, and stored them. Each one is now published under the server's name: the server's `echo` tool is `everything__echo`.
+
+    To register a server that you reach over HTTP, give its address instead:
+
+    ```bash
+    trunks register --name docs --url https://mcp.example.com/mcp --bearer-token "$DOCS_TOKEN"
+    ```
+  </Step>
+
+  <Step title="Call a tool">
+    Look at the tool's parameters:
+
+    ```bash
+    trunks usage everything__echo
+    ```
+
+    ```text
+    everything__echo
+      Echoes back the input string
+      server: everything   status: enabled
+
+    Input parameters:
+      - message (string, required)
+          Message to echo
+    ```
+
+    Then call it:
+
+    ```bash
+    trunks invoke everything__echo --input '{"message":"hello"}'
+    ```
+
+    ```text
+    Response from tool:
+    Echo: hello
+    ```
+
+    You can make the same kind of call over the REST API. The body holds the tool's `name` and its arguments side by side:
+
+    ```bash
+    curl -s http://127.0.0.1:8080/api/v0/tools/invoke \
+      -H 'content-type: application/json' \
+      -d '{"name":"everything__get-sum","a":2,"b":3}'
+    ```
+
+    ```json
+    {"content":[{"text":"The sum of 2 and 3 is 5.","type":"text"}]}
+    ```
+  </Step>
+
+  <Step title="Connect an MCP client">
+    The gateway's MCP endpoint is `http://127.0.0.1:8080/mcp` (Streamable HTTP). With Claude Code:
+
+    ```bash
+    claude mcp add --transport http trunks http://127.0.0.1:8080/mcp
+    ```
+
+    The client now lists `everything__echo` and the other tools. Every server you register later shows up on the same endpoint. For other clients, see [Connecting clients](/trunks/guides/connecting-clients).
+  </Step>
+</Steps>
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Upstream servers" icon="server" href="/trunks/guides/upstream-servers">
+    Register more servers, with credentials or OAuth.
+  </Card>
+  <Card title="Tool groups" icon="layer-group" href="/trunks/guides/tool-groups">
+    Expose only some tools to a client.
+  </Card>
+  <Card title="Enterprise mode" icon="users" href="/trunks/guides/enterprise-mode">
+    Share one server between people and agents, each with their own access.
+  </Card>
+  <Card title="Operations" icon="gear" href="/trunks/guides/operations">
+    Run Trunks in a container or behind a reverse proxy.
+  </Card>
+</Columns>

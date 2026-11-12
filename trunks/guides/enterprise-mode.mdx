@@ -1,0 +1,211 @@
+---
+title: "Enterprise mode"
+sidebarTitle: "Enterprise mode"
+description: "Share one Trunks server: initialize it, then manage users, teams, grants and MCP client tokens."
+---
+
+Enterprise mode is for a server that several people and agents share. Every request carries an access token, and each user and MCP client sees only what you granted to it.
+
+This page covers local identities and access. To sign people in through an identity provider, see [Single sign-on](/trunks/guides/single-sign-on). For the database, network and public URL, see [Operations](/trunks/guides/operations).
+
+## Start and initialize
+
+<Steps>
+  <Step title="Start the server in enterprise mode">
+    ```bash
+    TRUNKS_MODE=enterprise trunks start
+    ```
+
+    A new enterprise server refuses every request with `403 server is not initialized` until you initialize it.
+  </Step>
+  <Step title="Initialize it">
+    ```bash
+    trunks --registry https://trunks.example.com init-server
+    ```
+
+    ```text
+    Server initialized successfully
+    Admin access token: <token>
+    Saved to /home/you/.config/trunks/config.toml — this token is shown only once.
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+Initialize the server before anyone else can reach it. Until you do, anyone who can reach the server can run `init-server` and become the administrator.
+</Warning>
+
+`init-server` stores the token and the server address in the CLI configuration file, so the commands below need neither. The file is `config.toml` in a `trunks` folder of your user configuration directory:
+
+| System | Path |
+|---|---|
+| Linux | `~/.config/trunks/config.toml` |
+| macOS | `~/Library/Application Support/trunks/config.toml` |
+| Windows | `%APPDATA%\trunks\config.toml` |
+
+Set `TRUNKS_CONFIG` to use another file.
+
+There is one local administrator, `admin`. If you lose its token and no other administrator exists, the only way back is to restore or reset the database.
+
+## Users
+
+Create a user:
+
+```bash
+trunks create user ana
+```
+
+```text
+User ana created.
+Access token: <token>
+Log in with: trunks login <token>
+This token is shown only once.
+```
+
+Give the token to the person. They store it on their own machine:
+
+```bash
+trunks --registry https://trunks.example.com login <token>
+```
+
+| To | Run |
+|---|---|
+| Create a user with a token you choose (8 characters or more, no whitespace) | `trunks create user ana --access-token <token>` |
+| List users | `trunks list users` |
+| Replace a user's token (the old one stops working at once) | `trunks update user ana` |
+| Remove a user | `trunks delete user ana` |
+
+Users you create this way have the role `user`. Removing a user also removes their sessions, team memberships, grants and the MCP clients they own.
+
+## Grants
+
+A new user can use nothing. As an administrator, you grant access to whole servers or to [tool groups](/trunks/guides/tool-groups):
+
+```bash
+trunks grant --user ana --server github      # every tool, prompt and resource of one server
+trunks grant --user ana --group triage       # only the tools of one group
+trunks grant --user ana --server '*'         # every server, including future ones
+trunks revoke --user ana --server github
+trunks list grants
+```
+
+Each grant has one subject (`--user` or `--team`) and one target (`--server` or `--group`).
+
+Grants are stored by name. A grant on a server that does not exist yet, or that you remove and register again, applies as soon as a server of that name exists.
+
+## Teams
+
+Teams let you grant once for several people:
+
+```bash
+trunks create team platform --description "Platform team"
+trunks add-team-member platform ana --role maintainer
+trunks add-team-member platform rui
+trunks grant --team platform --server github
+trunks list teams
+```
+
+Remove a member with `trunks remove-team-member platform rui`, and a team with `trunks delete team platform`.
+
+A user can use everything granted to them directly, plus everything granted to their teams.
+
+| Team role | Can |
+|---|---|
+| `member` (default) | use what the team was granted |
+| `maintainer` | the same, plus add or remove team members and manage the team's MCP clients |
+
+<Warning>
+Deleting a team removes its memberships, its grants and **the MCP clients it owns**. Their tokens stop working at once.
+</Warning>
+
+## MCP clients
+
+Agents and MCP client applications authenticate on the MCP endpoints with the token of an **MCP client**, never with a user's token.
+
+```bash
+trunks create mcp-client ci-agent --owner team:platform --allow github --description "CI agent"
+```
+
+```text
+MCP client ci-agent created.
+Owner: team platform
+Access token: <token>
+Allowed servers: github
+This token is shown only once.
+```
+
+`--allow` takes server names, repeated or comma-separated, or `*`. What a client can reach depends on its owner and its allow list:
+
+| Owner | Allow list | The client can use |
+|---|---|---|
+| user or team | empty, or `*` | everything its owner can use, tool groups included |
+| user or team | server names | those servers, as far as the owner can use them; nothing through the owner's tool groups |
+| none | server names | those servers |
+| none | `*` | every server |
+| none | empty | nothing |
+
+An owned client follows its owner. Revoke a grant from the owner and the client loses it too.
+
+Who can create which client:
+
+- A user creates clients they own (the default) or, with `--owner team:<name>`, clients owned by a team they maintain.
+- An administrator can set any owner (`user:<name>` or `team:<name>`), or none.
+
+| To | Run |
+|---|---|
+| List clients (your own and your teams'; all of them, for an administrator) | `trunks list mcp-clients` |
+| Change the allow list (replaces the current one) | `trunks update mcp-client ci-agent --allow github,jira` |
+| Change the description | `trunks update mcp-client ci-agent --description "…"` |
+| Replace the token with a new one | `trunks update mcp-client ci-agent --rotate-token` |
+| Set a token you choose | `trunks update mcp-client ci-agent --access-token <token>` |
+| Remove a client | `trunks delete mcp-client ci-agent` |
+
+<Tip>
+Use one client per agent, or per application of each person. You can then replace or remove one token without affecting the others.
+</Tip>
+
+To configure the token in an application, see [Connecting clients](/trunks/guides/connecting-clients).
+
+## Who can do what
+
+| Action | `user` | team `maintainer` | `admin` |
+|---|---|---|---|
+| List and call what they were granted (CLI, REST API) | yes | yes | everything |
+| Create and manage their own MCP clients | yes | yes | yes |
+| Manage a team's members and MCP clients | no | their teams | yes |
+| Register, change, enable, disable, remove servers | no | no | yes |
+| Create, change, remove tool groups | no | no | yes |
+| Create and remove users and teams; grant and revoke | no | no | yes |
+
+Check your own identity and access with the REST API:
+
+```bash
+curl -s https://trunks.example.com/api/v0/users/whoami -H "Authorization: Bearer $TOKEN"
+```
+
+```json
+{"username":"ana","role":"user","teams":[{"name":"platform","role":"maintainer"}],
+ "access":{"all":false,"servers":["github"],"tool_groups":[]},
+ "grants":[{"subject_kind":"team","subject":"platform","target_kind":"server","target":"github"}]}
+```
+
+`grants` lists where your access comes from: your own grants and those of your teams. The endpoints for users, teams, clients and grants are in the [HTTP API reference](/trunks/reference/http-api).
+
+## In the web console
+
+You can do everything on this page in the web console too, under **Access** in the navigation:
+
+| Page | Who | Does |
+|---|---|---|
+| **MCP clients** | every user | lists your clients and your teams' (all of them, for an administrator); creates one, replaces its token, deletes it |
+| **Users** | administrators | adds a user, replaces a user's token, deletes a user |
+| **Teams** | every user reads; administrators create and delete; maintainers manage their team's members | members and their roles |
+| **Access** | administrators | adds and revokes grants |
+| **Account** (in the menu with your name) | every user | what you can use and through which grant; sign out |
+
+The console shows a token once, when you create or replace it, in a dialog that only closes with **Done**. The console does not keep it.
+
+Two things are not in the console:
+
+- changing a client's allow list (`trunks update mcp-client <name> --allow …`);
+- changing a team's description (REST API only, `PUT /api/v0/teams/<name>`).

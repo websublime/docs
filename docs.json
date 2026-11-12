@@ -85,7 +85,42 @@
           {
             "group": "Get started",
             "pages": [
-              "trunks/overview"
+              "trunks/overview",
+              "trunks/quickstart",
+              "trunks/installation"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "trunks/concepts/core-concepts",
+              "trunks/concepts/modes-and-identities"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "trunks/guides/upstream-servers",
+              "trunks/guides/tool-groups",
+              "trunks/guides/enterprise-mode",
+              "trunks/guides/single-sign-on",
+              "trunks/guides/connecting-clients",
+              "trunks/guides/operations"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "trunks/reference/cli",
+              "trunks/reference/configuration",
+              "trunks/reference/http-api",
+              "trunks/reference/mcp-endpoints"
+            ]
+          },
+          {
+            "group": "Project",
+            "pages": [
+              "trunks/changelog"
             ]
           }
         ]

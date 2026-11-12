@@ -1,0 +1,94 @@
+---
+title: "Single sign-on (OIDC)"
+sidebarTitle: "Single sign-on"
+description: "Sign people in to the Trunks console through an OpenID Connect provider, with admin and team sync from groups."
+---
+
+Trunks can sign people in through an OpenID Connect (OIDC) provider. This is a browser sign-in: the console's sign-in page shows **Sign in with SSO** next to the access-token field, and a successful sign-in opens a session cookie.
+
+The CLI and MCP clients keep using access tokens. Grants are always managed in Trunks; see [Enterprise mode](/trunks/guides/enterprise-mode).
+
+<Note>
+Single sign-on is for enterprise mode. In development mode no sign-in is required, so Trunks only logs a warning at start-up if you configure an issuer.
+</Note>
+
+## Set it up
+
+<Steps>
+  <Step title="Register a client at the provider">
+    Use the redirect URI `<public URL>/auth/callback`, for example `https://trunks.example.com/auth/callback`. A confidential client (with a secret) and a public client both work. Trunks always uses PKCE.
+  </Step>
+  <Step title="Start Trunks with the provider settings">
+    ```bash
+    TRUNKS_MODE=enterprise
+    TRUNKS_PUBLIC_URL=https://trunks.example.com
+    TRUNKS_OIDC_ISSUER=https://idp.example.com/realms/main
+    TRUNKS_OIDC_CLIENT_ID=trunks
+    TRUNKS_OIDC_CLIENT_SECRET=...            # omit for a public client
+    ```
+
+    Setting `TRUNKS_OIDC_ISSUER` turns single sign-on on. Start-up fails if `TRUNKS_OIDC_CLIENT_ID` or `TRUNKS_PUBLIC_URL` is missing.
+  </Step>
+  <Step title="Sign in">
+    Open the console and choose **Sign in with SSO**.
+  </Step>
+</Steps>
+
+## Settings
+
+Each setting is also a `trunks start` flag.
+
+| Flag | Environment variable | Meaning | Default |
+|---|---|---|---|
+| `--oidc-issuer` | `TRUNKS_OIDC_ISSUER` | issuer URL; setting it turns on sign-in through the provider. Requires the client ID and the public URL | unset |
+| `--oidc-client-id` | `TRUNKS_OIDC_CLIENT_ID` | client ID registered at the provider | unset |
+| `--oidc-client-secret` | `TRUNKS_OIDC_CLIENT_SECRET` | client secret; omit it for a public client | unset |
+| `--oidc-scopes` | `TRUNKS_OIDC_SCOPES` | comma-separated scopes requested in addition to `openid` | `profile,email` |
+| `--oidc-groups-claim` | `TRUNKS_OIDC_GROUPS_CLAIM` | claim that holds the user's groups | `groups` |
+| `--oidc-admin-group` | `TRUNKS_OIDC_ADMIN_GROUP` | group whose members are administrators; without it, sign-in never changes roles | unset |
+| `--oidc-sync-teams` | `TRUNKS_OIDC_SYNC_TEAMS` | `true` keeps team memberships in step with the groups claim | `false` |
+| `--oidc-team-prefix` | `TRUNKS_OIDC_TEAM_PREFIX` | only groups with this prefix become teams; Trunks removes the prefix from the team name | empty |
+| `--public-url` | `TRUNKS_PUBLIC_URL` | the address people use; the redirect URI is built from it | unset |
+| `--session-ttl-hours` | `TRUNKS_SESSION_TTL_HOURS` | lifetime of a console session | `12` |
+
+<Tip>
+Pass the client secret as an environment variable, not a flag. Flags show up in process listings.
+</Tip>
+
+All server settings are in the [configuration reference](/trunks/reference/configuration).
+
+## How identities are handled
+
+- Trunks identifies a person by the provider's issuer and subject. The first sign-in creates a Trunks user named after `preferred_username`, else `email`, else the subject.
+- Trunks never attaches a provider identity to an existing local user of the same name; it refuses that sign-in. This keeps a provider account called `admin` from taking over the local administrator. To let that person in, an administrator removes the local user first.
+- Of a browser session, the database stores only a hash.
+
+## Groups
+
+Trunks reads groups from the groups claim of the ID token. If the ID token has no such claim, it asks the provider's userinfo endpoint. The claim can be a list of strings or one string with comma- or space-separated values. Change its name with `TRUNKS_OIDC_GROUPS_CLAIM`.
+
+If the claim is absent everywhere, Trunks leaves roles and teams as they are.
+
+## The admin group
+
+Set `TRUNKS_OIDC_ADMIN_GROUP=<group>` to manage roles from the provider. On every sign-in:
+
+- members of that group become administrators;
+- everyone else becomes a plain user.
+
+Trunks never demotes the last administrator, so you cannot lock everyone out. Without this setting, sign-in never changes a role.
+
+## Team sync
+
+Set `TRUNKS_OIDC_SYNC_TEAMS=true` to turn groups into teams. On every sign-in:
+
+- Trunks creates the teams that are missing;
+- the user's synced memberships follow the provider: Trunks adds the new ones and removes the ones the provider no longer reports.
+
+Set `TRUNKS_OIDC_TEAM_PREFIX=trunks-` to sync only groups that start with `trunks-`. The group `trunks-platform` then becomes the team `platform`.
+
+Trunks never touches memberships that someone added by hand.
+
+<Note>
+The provider decides who belongs to which team. What a team can use is still a grant in Trunks: `trunks grant --team platform --server github`.
+</Note>

@@ -1,0 +1,143 @@
+---
+title: "Operations"
+sidebarTitle: "Operations"
+description: "Run a Trunks server: database, network, logs and metrics, upgrades and common problems."
+---
+
+This page is for whoever configures and keeps a Trunks server running. To install it, see [Installation](/trunks/installation). Every setting is in the [configuration reference](/trunks/reference/configuration).
+
+## Modes
+
+| | `development` | `enterprise` |
+|---|---|---|
+| Authentication | none | tokens (or single sign-on) on everything |
+| Who sees what | everyone sees everything | users and MCP clients see only what they were granted |
+| Initialization | automatic | `trunks init-server`, once |
+| Listens on (without `TRUNKS_BIND_HOST`) | `127.0.0.1` | every interface |
+| Logs | text | JSON, one object per line |
+| `/metrics` | off by default | on by default |
+
+<Warning>
+Development mode has no access control at all. Give it a non-loopback address (`--host`) only on a network where everyone who can reach it is trusted. Trunks warns at start-up when you do.
+</Warning>
+
+The database records the mode at initialization. Starting later with a different `TRUNKS_MODE` is a start-up error, not a conversion. To set up enterprise mode, see [Enterprise mode](/trunks/guides/enterprise-mode).
+
+## Database
+
+`TRUNKS_DATABASE_URL` picks the database. The default is `sqlite://trunks.db`, in the working directory.
+
+| | SQLite | PostgreSQL |
+|---|---|---|
+| URL | `sqlite://path/trunks.db` (`sqlite:///abs/trunks.db` for an absolute path) | `postgres://user:pass@host:5432/db` |
+| For | one person, a small team | enterprise mode |
+| Backup | `sqlite3 trunks.db ".backup copy.db"` while the server runs; or stop it and copy `trunks.db` **together with** its `-wal` and `-shm` files | `pg_dump` |
+
+- **Keep the password out of the environment.** Set `TRUNKS_DATABASE_URL_FILE` to a file that holds the URL, such as a Docker or Kubernetes secret mounted as a file. It takes precedence over `TRUNKS_DATABASE_URL`. Trunks trims surrounding whitespace; an empty or unreadable file is a start-up error that names the file, never its contents.
+- **Run one instance per database.** Each instance holds the catalog (servers, tools, groups) in memory and reloads it only when a change is made through that instance. Other instances on the same database do not see the change until they restart.
+
+<Warning>
+The database holds secrets in clear text: access tokens of users and MCP clients, upstream credentials (bearer tokens, headers, `env` values) and OAuth tokens. Protect the file or the instance, and its backups, the way you protect a password vault.
+</Warning>
+
+## Network
+
+Trunks speaks plain HTTP. In production, put it behind a reverse proxy that terminates TLS.
+
+| Setting | What it is | In production |
+|---|---|---|
+| `TRUNKS_BIND_HOST` / `TRUNKS_PORT` | where Trunks listens; port `8080` by default. An empty host means every interface | an internal interface, or a port published only to the proxy |
+| `TRUNKS_PUBLIC_URL` | the address as seen from outside | `https://trunks.example.com`. It decides the cookie's `Secure` flag, the origin accepted for changes made with a browser session, and the [single sign-on](/trunks/guides/single-sign-on) redirect |
+| `TRUNKS_ALLOWED_HOSTS` | comma-separated `Host` headers accepted on the MCP endpoints, against DNS rebinding; only loopback names by default | the public host name; any other `Host` gets 403 |
+
+At the proxy:
+
+- **Do not buffer responses** of `/mcp` and `/v0/groups/<name>/mcp`. They are streams (`text/event-stream`).
+- Set the read timeout above `TRUNKS_REQUEST_TIMEOUT_SEC`, so that Trunks answers 504 before the proxy cuts the connection.
+- Keep the idle timeout of connections from the proxy to Trunks **below 30 s**. Trunks closes connections that stay idle for 30 s.
+- Trunks refuses request bodies over 4 MiB (413).
+
+Trunks' own time limits:
+
+| Limit | Value |
+|---|---|
+| A client sends the request header | 30 s |
+| A REST request, and each call to an upstream | `TRUNKS_REQUEST_TIMEOUT_SEC`, 300 s by default; `0` turns it off |
+| The handshake with an upstream | `TRUNKS_UPSTREAM_INIT_TIMEOUT_SEC`, 30 s by default |
+| An idle stateful upstream session | `TRUNKS_SESSION_IDLE_TIMEOUT_SEC`, `0` (never) by default |
+
+## Upstream processes
+
+- A `stdio` upstream runs on the Trunks machine or container, as the Trunks user, with Trunks' environment plus its configured `env`. Register only commands you trust: whoever can register servers can run programs. In enterprise mode only administrators can.
+- When a session ends, Trunks terminates the process and everything it started.
+- The process's stderr goes to the log with the target `upstream.stderr`, with configured `env` values replaced by `[redacted]`. A secret that the server obtains another way and prints is logged as is.
+
+For transports and session modes, see [Upstream servers](/trunks/guides/upstream-servers).
+
+## Observe
+
+### Logs
+
+Logs go to stdout: text in development mode, JSON in enterprise mode (one object per line and nothing else, ready for a log collector).
+
+`TRUNKS_LOG` is a [`tracing` filter](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html); the default is `info`. If it is unset, Trunks reads `RUST_LOG`.
+
+- Each response logs one line with method, path (without the query string), status, latency and the kind of caller.
+- `TRUNKS_LOG=info,upstream.stderr=off` silences the upstreams' stderr.
+- `debug` and `trace` record tool arguments, tool results and SQL text. Avoid them in production; Trunks warns at start-up when they are on.
+
+### Endpoints
+
+None of these need authentication.
+
+| Endpoint | Returns |
+|---|---|
+| `GET /health` | `{"status":"ok"}` with 200 while the process serves. It does not check upstreams |
+| `GET /metadata` | `{"version":"…"}`, the server's version |
+| `GET /metrics` | Prometheus metrics in OpenMetrics text format. Only present when metrics are on |
+
+`TRUNKS_METRICS_ENABLED` (`true` or `false`) overrides the mode's default.
+
+<Warning>
+`/metrics` has no authentication. Do not publish it outside your network.
+</Warning>
+
+### Metrics
+
+| Metric | Type | Labels | Meaning |
+|---|---|---|---|
+| `trunks_tool_calls_total` | counter | `mcp_server_name`, `tool_name`, `outcome` | tool and prompt calls proxied to upstreams |
+| `trunks_tool_call_latency_seconds` | histogram | `mcp_server_name`, `tool_name`, `outcome` | latency of those calls |
+| `trunks_upstream_sessions_active` | gauge | `mcp_server_name`, `mode` | upstream sessions open right now (stateful: kept between calls; stateless: one per call in flight) |
+| `trunks_upstream_connect_errors_total` | counter | `mcp_server_name` | failed attempts to open a session with an upstream; when it climbs, an upstream is down |
+| `trunks_build_info` | gauge | `version` | the running version (always `1`) |
+
+### Web console
+
+The web console at `/` shows what the gateway holds. Its **Diagnostics** page (administrators only, in enterprise mode) shows the database backend, the listen address, the allowed hosts, the time limits, the upstreams whose last connection failed, and the authorizations still pending. The same data is at `GET /api/dashboard/diagnostics`.
+
+## Stop, upgrade, roll back
+
+- **Stop:** on `SIGTERM` (or Ctrl-C), Trunks stops accepting connections, gives requests in flight 10 s, closes the upstream sessions and exits with 0. MCP streams still open after 10 s are cut; clients reconnect.
+- **Upgrade:** back up the database, replace the binary or the image, and start. Trunks applies migrations automatically at start-up, and they only add to the schema.
+- **Roll back:** restore the backup taken before the upgrade, then start the older version. An older version on a newer schema is not supported.
+- Tokens survive an upgrade: MCP clients and CLIs stay configured.
+- `trunks version` shows the version of the CLI and of the server. A version with `+<commit>` is not a release build.
+
+See the [changelog](/trunks/changelog) for what changes between versions.
+
+## Common problems
+
+| Symptom | Likely cause |
+|---|---|
+| `403 server is not initialized` | enterprise mode without `trunks init-server` |
+| start-up fails mentioning the mode | `TRUNKS_MODE` differs from the mode the database was initialized with |
+| start-up fails mentioning the `sse` transport | an enabled server uses the unsupported `sse` transport; re-register it as `streamable_http`, disable it, or set `TRUNKS_IGNORE_SSE_SERVERS=1` |
+| an MCP client gets 403 as soon as it connects | the `Host` it uses is not in `TRUNKS_ALLOWED_HOSTS` |
+| `401 invalid MCP client token` | a user's token on an MCP endpoint (or the reverse); they are different identities |
+| a user or client sees nothing | a grant is missing (`trunks grant …`) or the server is not in the client's allow list |
+| `tool '…' not found` for a tool that exists | it is disabled, outside the group, or out of the caller's reach; the answer is the same on purpose |
+| `failed to spawn 'npx'` | the distroless image has no `npx`; use the `-stdio` image |
+| `504` with `did not answer within …s` | the upstream did not answer within `TRUNKS_REQUEST_TIMEOUT_SEC` |
+| MCP answers cut short, or arriving all at the end | the proxy buffers responses or has a short timeout |
+| occasional "connection closed" in a client that keeps connections open | the client reused a connection idle for more than 30 s; lower the idle timeout of the client or the proxy |

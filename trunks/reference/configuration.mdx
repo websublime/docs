@@ -1,0 +1,161 @@
+---
+title: "Configuration reference"
+sidebarTitle: "Configuration"
+description: "Every trunks start flag and environment variable, the CLI config file, logging and ${VAR} expansion in JSON definition files."
+---
+
+This page lists every setting Trunks reads at version `v0.1.0-rc.2`: the server flags of `trunks start`, the settings of the management CLI, and the JSON files you pass to commands with `-c`.
+
+## How settings are resolved
+
+You can give each server setting as a command-line flag or as an environment variable. Trunks uses the first value it finds, in this order:
+
+1. the command-line flag;
+2. the environment variable;
+3. a `.env` file in the working directory or one of its parents;
+4. the default.
+
+A variable set in the environment always wins over the same variable in `.env`. A missing `.env` file is not an error. Every `trunks` command reads `.env`, not only `trunks start`.
+
+## Server (`trunks start`)
+
+### Basics
+
+| Flag | Environment variable | Meaning | Default |
+|---|---|---|---|
+| `--mode` | `TRUNKS_MODE` | `development` or `enterprise`, case-insensitive. Fixed once the database is initialized: starting in the other mode is a start-up error. | `development` |
+| `--host` | `TRUNKS_BIND_HOST` | Address to listen on. An empty value means every interface. | `127.0.0.1` in development mode, every interface (`0.0.0.0`) in enterprise mode. The container images set `0.0.0.0`. |
+| `--port` | `TRUNKS_PORT` | Port to listen on. | `8080` |
+| `--database-url` | `TRUNKS_DATABASE_URL` | `sqlite://<path>` or `postgres://user:pass@host:port/db`. | `sqlite://trunks.db` |
+| `--database-url-file` | `TRUNKS_DATABASE_URL_FILE` | File that holds the database URL, for a secret mounted as a file. Takes precedence over the URL. Surrounding whitespace is ignored. An unreadable or empty file is a start-up error. | unset |
+| `--public-url` | `TRUNKS_PUBLIC_URL` | The server's address as browsers see it, for example `https://trunks.example.com`. Decides the session cookie's `Secure` flag and the accepted `Origin`. Required for single sign-on. | unset |
+| `--allowed-hosts` | `TRUNKS_ALLOWED_HOSTS` | Comma-separated `Host` header values accepted on the MCP endpoints, as protection against DNS rebinding. `*` turns the check off. | loopback names only (`localhost`, `127.0.0.1`) |
+
+<Warning>
+Development mode has no authentication. If you bind it to anything other than a loopback address, Trunks logs a warning: everyone who can reach that address can manage the server and run the commands of its stdio upstreams.
+</Warning>
+
+### Limits and sessions
+
+| Flag | Environment variable | Meaning | Default |
+|---|---|---|---|
+| `--request-timeout-sec` | `TRUNKS_REQUEST_TIMEOUT_SEC` | Upper bound, in seconds, for one REST request and for one call to an upstream. `0` means no limit. | `300` |
+| `--upstream-init-timeout-sec` | `TRUNKS_UPSTREAM_INIT_TIMEOUT_SEC` | Seconds allowed for the MCP handshake with an upstream. Values below 1 count as 1. | `30` |
+| `--session-idle-timeout-sec` | `TRUNKS_SESSION_IDLE_TIMEOUT_SEC` | Close `stateful` upstream sessions idle for this many seconds. `0` means never. | `0` |
+| `--session-ttl-hours` | `TRUNKS_SESSION_TTL_HOURS` | Lifetime of a browser session, in hours. Values below 1 count as 1. | `12` |
+
+Some limits are fixed:
+
+- request bodies are at most 4 MiB (413 beyond that), on the REST API and on the MCP endpoints;
+- a client has 30 s to send a request's header, and an idle kept-alive connection is closed after 30 s;
+- an MCP request body may pause for at most 30 s while it is being sent;
+- at shutdown, requests in flight get 10 s to finish.
+
+### Observability
+
+| Flag | Environment variable | Meaning | Default |
+|---|---|---|---|
+| `--metrics <true\|false>` | `TRUNKS_METRICS_ENABLED` | Serve Prometheus metrics at `/metrics`. The flag takes a value. | on in enterprise mode, off in development mode |
+| — | `TRUNKS_LOG` | Log filter in `tracing` syntax, for example `info`, `debug` or `info,upstream.stderr=off`. When it is unset, Trunks reads `RUST_LOG`. | `info` |
+
+The log format follows the mode. Development mode writes text and prints a banner with the listen address. Enterprise mode writes JSON, one object per line, with `timestamp`, `level`, `fields`, `target`, and the request `span` on access-log lines. The access log has one line per response, with the method, the path (never the query string), the status, the latency and the kind of caller.
+
+<Warning>
+At `debug` or `trace` level, the MCP and database libraries record tool arguments, tool results and SQL text. Trunks warns you at start-up. Do not leave verbose logging on in production.
+</Warning>
+
+### Single sign-on (OIDC)
+
+Single sign-on is for enterprise mode. See [Single sign-on](/trunks/guides/single-sign-on).
+
+| Flag | Environment variable | Meaning | Default |
+|---|---|---|---|
+| `--oidc-issuer` | `TRUNKS_OIDC_ISSUER` | Issuer URL. Setting it turns on sign-in through the provider. Requires the client id and the public URL, or the server does not start. | unset |
+| `--oidc-client-id` | `TRUNKS_OIDC_CLIENT_ID` | Client id registered at the provider. | unset |
+| `--oidc-client-secret` | `TRUNKS_OIDC_CLIENT_SECRET` | Client secret. Omit it for a public client. | unset |
+| `--oidc-scopes` | `TRUNKS_OIDC_SCOPES` | Comma-separated scopes requested in addition to `openid`. | `profile,email` |
+| `--oidc-groups-claim` | `TRUNKS_OIDC_GROUPS_CLAIM` | Claim, in the ID token or userinfo, that holds the user's groups. | `groups` |
+| `--oidc-admin-group` | `TRUNKS_OIDC_ADMIN_GROUP` | Group whose members are administrators. The role is synced on every sign-in. Without it, sign-in never changes roles. | unset |
+| `--oidc-sync-teams` | `TRUNKS_OIDC_SYNC_TEAMS` | Keep team memberships in step with the groups claim on every sign-in. The flag takes no value; the variable takes `true` or `false`. | `false` |
+| `--oidc-team-prefix` | `TRUNKS_OIDC_TEAM_PREFIX` | Only groups with this prefix become teams. Trunks removes the prefix from the team name. | empty |
+
+Register `<public URL>/auth/callback` as the redirect URI at the provider.
+
+<Tip>
+Set the client secret with `TRUNKS_OIDC_CLIENT_SECRET`, not the flag. Flags show up in process listings.
+</Tip>
+
+<Note>
+If you set an issuer in development mode, the server still starts and logs a warning. Sign-in through the provider is not available in that mode, because development mode requires no sign-in.
+</Note>
+
+### Migration
+
+| Environment variable | Meaning | Default |
+|---|---|---|
+| `TRUNKS_IGNORE_SSE_SERVERS` | Set to `1` to start even when the database holds enabled servers with the unsupported `sse` transport. Trunks skips them with a warning. Otherwise it refuses to start and names those servers. | unset |
+
+To fix the cause, register those servers again with the `streamable_http` transport, or disable them.
+
+## Management CLI
+
+Every command other than `trunks start` talks to a running server over its REST API.
+
+| Flag | Environment variable | Meaning | Default |
+|---|---|---|---|
+| `--registry` | `TRUNKS_REGISTRY` | Base URL of the Trunks server to manage. Works with every command. | the config file's `registry_url`, else `http://127.0.0.1:8080` |
+| — | `TRUNKS_CONFIG` | Path of the CLI config file. | see below |
+
+### The config file
+
+[`trunks init-server`](/trunks/reference/cli#trunks-init-server) and [`trunks login`](/trunks/reference/cli#trunks-login) write the config file. It is TOML:
+
+```toml config.toml
+registry_url = "https://trunks.example.com"
+access_token = "..."
+```
+
+<ParamField path="registry_url" type="string">
+  The server that commands talk to when you give no `--registry` and no `TRUNKS_REGISTRY`.
+</ParamField>
+
+<ParamField path="access_token" type="string">
+  A user's access token. The CLI sends it as a bearer token with every management command.
+</ParamField>
+
+By default, the file is `trunks/config.toml` inside your operating system's config directory:
+
+| Operating system | Path |
+|---|---|
+| Linux | `~/.config/trunks/config.toml` (or `$XDG_CONFIG_HOME/trunks/config.toml`) |
+| macOS | `~/Library/Application Support/trunks/config.toml` |
+| Windows | `%APPDATA%\trunks\config.toml` |
+
+Set `TRUNKS_CONFIG` to use another path. On Linux and macOS, Trunks makes the file readable by its owner only (mode `0600`). A missing or unreadable file counts as empty.
+
+## JSON definition files
+
+Some commands take a JSON file with `-c`:
+
+- [`trunks register`](/trunks/reference/cli#trunks-register), for an upstream server ([format](/trunks/guides/upstream-servers));
+- `trunks create group` and `trunks update group`, for a tool group ([format](/trunks/guides/tool-groups));
+- `trunks create user` and `trunks create mcp-client` ([enterprise mode](/trunks/guides/enterprise-mode)).
+
+Before sending the file, the CLI replaces every `$\{VAR\}` inside any JSON string, at any depth, with the environment variable `VAR` of the CLI process. Use this to keep secrets out of the file:
+
+```json server.json
+{
+  "name": "github",
+  "transport": "streamable_http",
+  "url": "https://api.githubcopilot.com/mcp/",
+  "bearer_token": "${GITHUB_TOKEN}"
+}
+```
+
+The rules:
+
+- Only the `$\{NAME\}` form is recognized. `$NAME` stays as it is.
+- A name has letters, digits and `_` only.
+- A variable that is not set is an error. Trunks never substitutes an empty string.
+- An unterminated `$\{` is an error.
+- Numbers, booleans and object keys are not expanded.

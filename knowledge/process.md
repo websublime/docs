@@ -64,6 +64,7 @@ flowchart LR
   vale *.mdx */*.mdx   # same config as the Mintlify vale-spellcheck check (D21)
   bun scripts/leak-lint.ts
   bun scripts/sync.ts --validate
+  bun scripts/gen.ts --check
   ```
 - **Visual changes:** check them in `mint dev`, in both light and dark mode, and attach screenshots to the pull request.
 - **Review:** a reviewer pass (human, or the `code-reviewer`/`reviewer` agent) checks the change against its intent and the decisions log. Fix every finding in the same pull request, then go back through CI.
