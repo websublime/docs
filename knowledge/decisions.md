@@ -309,3 +309,35 @@ Agents and humans read it before they change anything in this repository.
   - **Design-system sheets are not published.** Component specs, patterns and tokens are internal design material (D3).
   - **Accessibility.** Every image has alt text describing what the screen shows, and a caption.
 - **First use:** the Trunks web-console designs (version 0.4.0 in the mockups) on `trunks/overview`. They are the Overview screen after the hero, plus Servers, Register, Tools, Tool groups, MCP clients and Diagnostics in a "Web console" section. The New components, Patterns and Tokens sheets were left out.
+
+## D23: Sync tooling
+
+- **Status:** accepted (2026-11-12, issue #5). Amends D7, which named the registry but did not define its schema, its runtime or what happens when a newer release appears.
+- **Decision:**
+  1. **Registry:** `sync/registry.yaml`, read by Bun (`Bun.YAML`) scripts, so the repository needs no npm dependencies. CI installs Bun 1.4.3.
+     - Each project has `slug`, `name`, `repo`, `checkout`, `status` (D8), `accent` (D10), `exclude` (D3) and `sources`.
+     - A source has:
+       - `name`;
+       - `channel` (`stable`, `stable-else-prerelease`, `branch`);
+       - `tagPattern`, with one capture group for the version;
+       - `branch`;
+       - `ref` (D5);
+       - `lastSynced`, a full commit sha;
+       - `watch`, mapping each page to the globs it depends on.
+     - Projects with independently released packages (line-ui) have one source per package.
+  2. **`scripts/sync.ts`:** reports, per source:
+     - any newer release;
+     - the files changed in `lastSynced..ref`, minus exclusions;
+     - the pages those files affect;
+     - the unmapped files.
+
+     `--mark-synced <slug>` moves `lastSynced` to the resolved ref, in the same pull request as the page updates. `--validate` checks the structure in CI.
+  3. **Newer releases are reported, never applied.** Moving `ref` needs an intent and Miguel's confirmation (D5).
+  4. **The procedure** lives in `knowledge/sync.md`, which any agent can follow. `.claude/commands/docs-sync.md` points to it.
+  5. **`scripts/leak-lint.ts`** (CI) fails on internal ids, internal-doc paths, agent-file names and Portuguese text in published `.mdx` files and `docs.json`.
+     - An intended exception carries `{/* leak-lint: allow <reason> */}` on the same line, and applies to that line only.
+     - A marker without a reason is a finding.
+  6. **Reports:** `sync/reports/<slug>.md` lists the open contradictions at the ref, with file:line evidence, and the inventory items not reproduced at the ref.
+     - The header sha is the **commit** the ref resolves to (`<ref>^{commit}`), not the tag object.
+     - `sync/` is excluded from the site.
+- **Why:** Miguel's choices on issue #5.

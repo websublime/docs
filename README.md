@@ -13,6 +13,7 @@ Source of [docs.websublime.com](https://docs.websublime.com), the documentation 
 | `logo/` | websublime logos and favicons |
 | `scripts/` | Repository tooling. Not published |
 | `knowledge/` | Decisions, process, research and project inventories. Not published |
+| `sync/` | Sync registry (`registry.yaml`) and per-project source reports. Not published |
 
 ## Working here
 

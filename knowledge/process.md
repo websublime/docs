@@ -39,7 +39,7 @@ flowchart LR
 ## 4. Test and review
 
 - **CI must be green.** Every check on the pull request must pass:
-  - the `CI` workflow (`mint validate`, `mint broken-links`, and the line://ui asset check `node scripts/line-ui.mjs --check`), which runs on every pull request and on `main`;
+  - the `CI` workflow, which runs on every pull request and on `main`: `mint validate`, `mint broken-links`, the line://ui asset check `node scripts/line-ui.mjs --check`, the leak lint and the sync registry validation;
   - the checks the Mintlify GitHub App adds: `Mintlify Deployment` (preview build), `link-rot` and `vale-spellcheck`.
 
   A pull request with any red check is not ready. One exception (D18): when `Mintlify Deployment` is **skipped** for the head commit because it touched only `.mintignore` paths, the app's validation checks do not count. The `CI` workflow is then the gate. A failed deployment always blocks.
@@ -62,6 +62,8 @@ flowchart LR
   npx mint@4.3.19 broken-links
   node scripts/line-ui.mjs --check
   vale *.mdx */*.mdx   # same config as the Mintlify vale-spellcheck check (D21)
+  bun scripts/leak-lint.ts
+  bun scripts/sync.ts --validate
   ```
 - **Visual changes:** check them in `mint dev`, in both light and dark mode, and attach screenshots to the pull request.
 - **Review:** a reviewer pass (human, or the `code-reviewer`/`reviewer` agent) checks the change against its intent and the decisions log. Fix every finding in the same pull request, then go back through CI.

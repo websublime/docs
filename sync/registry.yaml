@@ -1,0 +1,362 @@
+projects:
+  - slug: delta
+    name: delta://
+    repo: websublime/delta
+    checkout: ../delta
+    status: stable
+    accent: indigo
+    exclude:
+      - CLAUDE.md
+      - AGENTS.md
+      - .claude/**
+      - .agents/**
+      - .knowledge/**
+      - .beads/**
+      - temp/**
+      - docs/plans/**
+      - dist/**
+    sources:
+      - name: main
+        channel: stable
+        tagPattern: ^@websublime/delta@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/delta@0.2.0"
+        lastSynced: 4a696c037371f1237ae0795cc397176934590220
+        watch:
+          delta/overview:
+            - README.md
+            - package.json
+            - LICENSE
+            - CHANGELOG.md
+            - src/index.ts
+            - src/types.ts
+            - src/diff.ts
+            - src/patch.ts
+            - src/snapshot.ts
+            - src/rfc6902.ts
+            - src/errors.ts
+            - .github/workflows/ci.yml
+  - slug: focus
+    name: Focus
+    repo: websublime/focus
+    checkout: ../focus
+    status: wip
+    accent: crimson
+    exclude:
+      - docs/**
+      - CLAUDE.md
+      - AGENTS.md
+      - .claude/**
+      - tools/oracle/**
+    sources:
+      - name: main
+        channel: branch
+        tagPattern: null
+        branch: origin/main
+        ref: origin/main
+        lastSynced: ce229fc444c8750e24b9551aa9ac734a1c7b1642
+        watch:
+          focus/overview:
+            - README.md
+            - Cargo.toml
+            - LICENSE
+            - rust-toolchain.toml
+            - dist-workspace.toml
+            - .github/workflows/release.yml
+            - .github/workflows/ci.yml
+            - fixtures/upstream/PIN
+            - crates/focus-cli/src/main.rs
+            - crates/focus-cli/src/graph.rs
+            - crates/focus-cli/src/audit.rs
+            - crates/focus-cli/src/runtime.rs
+            - crates/focus-cli/src/state.rs
+            - crates/focus-cli/src/jump.rs
+            - crates/focus-cli/src/utility.rs
+            - crates/focus-cli/src/hook.rs
+            - crates/focus-hooks/src/lib.rs
+            - crates/focus-hooks/src/group.rs
+            - crates/focus-harness/src/lib.rs
+  - slug: line-ui
+    name: line://ui
+    repo: websublime/line-ui
+    checkout: ../line-ui
+    status: wip
+    accent: lime
+    exclude:
+      - docs/**
+      - .claude/**
+      - temp/**
+      - AGENTS.md
+      - CLAUDE.md
+      - "**/AGENTS.md"
+      - "**/CLAUDE.md"
+    sources:
+      - name: line-tokens
+        channel: stable
+        tagPattern: ^@websublime/line-tokens@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-tokens@0.1.3"
+        lastSynced: f14dcb68b7ab22fae9f8bbc5dbd61ef2943b1a46
+        watch:
+          line-ui/overview:
+            - packages/line-tokens/package.json
+            - packages/line-tokens/README.md
+            - packages/line-tokens/src/index.css
+      - name: line-colors
+        channel: stable
+        tagPattern: ^@websublime/line-colors@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-colors@0.1.3"
+        lastSynced: f14dcb68b7ab22fae9f8bbc5dbd61ef2943b1a46
+        watch:
+          line-ui/overview:
+            - packages/line-colors/package.json
+            - packages/line-colors/README.md
+            - packages/line-colors/src/*.css
+      - name: line-themes
+        channel: stable
+        tagPattern: ^@websublime/line-themes@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-themes@0.1.2"
+        lastSynced: c92cabe48560ec0e0030fb34085e61c8c0d30fb5
+        watch:
+          line-ui/overview:
+            - packages/line-themes/package.json
+            - packages/line-themes/README.md
+            - packages/line-themes/src/index.css
+      - name: line-schemas
+        channel: stable
+        tagPattern: ^@websublime/line-schemas@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-schemas@0.1.1"
+        lastSynced: a3ee3088c0f19fe96b6c74f9a3b67584b094e089
+        watch:
+          line-ui/overview:
+            - packages/line-schemas/package.json
+            - packages/line-schemas/README.md
+      - name: line-utils
+        channel: stable
+        tagPattern: ^@websublime/line-utils@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-utils@0.1.0"
+        lastSynced: 10efd04c477b26045112a28754eece5b3dadb7c0
+        watch:
+          line-ui/overview:
+            - packages/line-utils/package.json
+            - packages/line-utils/README.md
+      - name: line-core
+        channel: stable
+        tagPattern: ^@websublime/line-core@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-core@0.2.2"
+        lastSynced: d1c542d542dab5af9162204f83549c78d5f7e2a3
+        watch:
+          line-ui/overview:
+            - packages/line-core/package.json
+            - packages/line-core/README.md
+            - packages/line-core/src/index.ts
+            - packages/line-core/src/machine/**
+      - name: line-components
+        channel: stable
+        tagPattern: ^@websublime/line-components@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-components@0.2.4"
+        lastSynced: a4f021dc5cb8eea48e98eca2b126b86c0b1614e6
+        watch:
+          line-ui/overview:
+            - README.md
+            - package.json
+            - LICENSE
+            - packages/line-components/package.json
+            - packages/line-components/README.md
+            - packages/line-components/CHANGELOG.md
+            - packages/line-components/src/index.ts
+            - packages/line-components/src/button/*.ts
+            - packages/line-components/src/stack/*.ts
+            - packages/line-components/src/separator/*.ts
+      - name: line-icons
+        channel: stable
+        tagPattern: ^@websublime/line-icons@(\d+\.\d+\.\d+)$
+        branch: null
+        ref: "@websublime/line-icons@0.2.0"
+        lastSynced: 28cd062dbbd2326458f7e6c766e76d6c0a294fd7
+        watch:
+          line-ui/overview:
+            - packages/line-icons/package.json
+            - packages/line-icons/README.md
+            - packages/line-icons/src/index.ts
+  - slug: trunks
+    name: Trunks
+    repo: websublime/trunks
+    checkout: ../trunks
+    status: rc
+    accent: teal
+    exclude:
+      - "docs/0[0-9]-*.md"
+      - docs/spikes/**
+      - spikes/**
+      - AGENTS.md
+      - CLAUDE.md
+      - .claude/**
+      - temp/**
+    sources:
+      - name: main
+        channel: stable-else-prerelease
+        tagPattern: "^v(\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.]+)?)$"
+        branch: null
+        ref: v0.1.0-rc.2
+        lastSynced: d111e0d96b0b3e7707687d3c4114a6da118dc06f
+        watch:
+          trunks/overview:
+            - README.md
+            - CHANGELOG.md
+            - Cargo.toml
+            - LICENSE
+            - dist-workspace.toml
+            - .github/workflows/release.yml
+            - .github/workflows/docker.yml
+            - Dockerfile
+            - docs/guide/operations.md
+            - docs/guide/clients.md
+            - crates/trunks/src/main.rs
+            - crates/trunks/src/commands/register.rs
+            - crates/trunks/src/commands/invoke.rs
+            - crates/trunks/src/commands/start.rs
+            - crates/trunks-api/src/lib.rs
+            - crates/trunks-core/src/gateway.rs
+            - crates/trunks-core/src/upstream.rs
+            - crates/trunks-core/src/metrics.rs
+            - web/app/src/pages/**
+            - web/app/src/lib/nav.ts
+  - slug: unblock
+    name: unblock
+    repo: websublime/unblock
+    checkout: ../unblock
+    status: wip
+    accent: orange
+    exclude:
+      - docs/PRD.md
+      - docs/PROCESS.md
+      - docs/STYLE.md
+      - docs/roadmap.html
+      - docs/plans/**
+      - .knowledge/**
+      - .claude/**
+      - .agents/**
+      - .beads/**
+      - AGENTS.md
+      - CLAUDE.md
+      - "**/CLAUDE.md"
+      - temp/**
+    sources:
+      - name: main
+        channel: stable
+        tagPattern: ^v(\d+\.\d+\.\d+(?:-rc\.\d+)?)$
+        branch: null
+        ref: v1.0.2
+        lastSynced: 842cdff3909ac356ac73f116d85516839167afba
+        watch:
+          unblock/overview:
+            - README.md
+            - Cargo.toml
+            - rust-toolchain.toml
+            - dist-workspace.toml
+            - crates/unblock-cli/Cargo.toml
+            - LICENSE-MIT
+            - LICENSE-APACHE
+            - .github/workflows/ci.yml
+            - .github/workflows/release.yml
+            - crates/unblock-cli/src/cli.rs
+            - crates/unblock-cli/src/exit.rs
+            - crates/unblock-cli/src/commands/init.rs
+            - crates/unblock-cli/tests/snapshots/help_snapshots__*.snap
+            - crates/unblock-mcp/src/options.rs
+            - crates/unblock-mcp/src/tools/mod.rs
+            - crates/unblock-mcp/src/resources/mod.rs
+            - crates/unblock-mcp/src/prompts/mod.rs
+            - crates/unblock-config/src/env.rs
+            - crates/unblock-config/src/keys.rs
+            - crates/unblock-config/src/discovery.rs
+  - slug: vite-open-api-server
+    name: vite-open-api-server
+    repo: websublime/vite-open-api-server
+    checkout: ../vite-open-api-server
+    status: stable
+    accent: purple
+    exclude:
+      - history/**
+      - .beads/**
+      - .claude/**
+      - AGENTS.md
+      - CLAUDE.md
+      - .github/copilot-instructions.md
+      - .changesets/history/**
+      - temp/**
+    sources:
+      - name: main
+        channel: stable
+        tagPattern: "^@websublime/vite-plugin-open-api-server@(\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?)$"
+        branch: null
+        ref: "@websublime/vite-plugin-open-api-server@0.23.3"
+        lastSynced: 830558cd36b86f4b8b09a899a3264886c190bd3d
+        watch:
+          vite-open-api-server/overview:
+            - README.md
+            - LICENSE
+            - CONTRIBUTING.md
+            - package.json
+            - packages/server/package.json
+            - packages/server/README.md
+            - packages/server/CHANGELOG.md
+            - packages/server/src/index.ts
+            - packages/server/src/types.ts
+            - packages/server/src/plugin.ts
+            - packages/server/src/handlers.ts
+            - packages/server/src/seeds.ts
+            - packages/server/src/hot-reload.ts
+            - packages/server/src/devtools.ts
+            - packages/core/package.json
+            - packages/core/src/parser/**
+            - packages/core/src/handlers/executor.ts
+            - packages/core/src/handlers/context.ts
+            - packages/core/src/generator/**
+            - packages/devtools-client/src/router.ts
+  - slug: workspace-tools
+    name: workspace-tools
+    repo: websublime/workspace-tools
+    checkout: ../workspace-node-tools
+    status: stable
+    accent: cyan
+    exclude:
+      - docs/**
+      - crates/*/docs/**
+      - temp/**
+      - .worktrees/**
+      - AGENTS.md
+      - CLAUDE.md
+      - .claude/**
+      - .beads/**
+      - .zed/**
+    sources:
+      - name: cli
+        channel: stable
+        tagPattern: "^sublime_cli_tools-v(\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?)$"
+        branch: null
+        ref: sublime_cli_tools-v0.0.37
+        lastSynced: c8ecda8dcd953bc756dda4ce35615d65b15ada39
+        watch:
+          workspace-tools/overview:
+            - README.md
+            - Cargo.toml
+            - crates/cli/Cargo.toml
+            - crates/cli/README.md
+            - crates/cli/src/cli/commands.rs
+            - crates/cli/src/cli/mod.rs
+            - crates/cli/src/cli/args.rs
+            - crates/cli/CHANGELOG.md
+            - dist-workspace.toml
+            - .github/workflows/release.yml
+            - packages/workspace-tools/package.json
+            - packages/workspace-tools/README.md
+            - CONTRIBUTING.md
+            - LICENSE-MIT
