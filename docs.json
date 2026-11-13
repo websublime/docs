@@ -4,9 +4,9 @@
   "name": "websublime",
   "description": "Documentation for websublime's open-source projects.",
   "colors": {
-    "primary": "#6d8a00",
+    "primary": "#5a7300",
     "light": "#c8ff00",
-    "dark": "#6d8a00"
+    "dark": "#5a7300"
   },
   "background": {
     "color": {

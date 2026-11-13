@@ -21,11 +21,11 @@ const docs = JSON.parse(readFileSync(join(root, "docs.json"), "utf8")) as { navi
 
 function label(page: string): string {
   const text = readFileSync(join(root, `${page}.mdx`), "utf8");
-  const fm = /^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? "";
-  const field = (key: string) => new RegExp(`^${key}:\\s*"?(.*?)"?\\s*$`, "m").exec(fm)?.[1];
-  const value = field("sidebarTitle") ?? field("title");
+  const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? "";
+  const data = (Bun.YAML.parse(fm) ?? {}) as { sidebarTitle?: string; title?: string };
+  const value = data.sidebarTitle ?? data.title;
   if (!value) throw new Error(`${page}.mdx has no sidebarTitle or title`);
-  return value;
+  return String(value);
 }
 
 const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/[{}]/g, (c) => `\\${c}`);

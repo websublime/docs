@@ -51,7 +51,9 @@ function step(hue, n) {
 const neutral1 = step("neutral", 1);
 // The line://ui brand lime is not a palette step: it is the brand ink from
 // line-ui `branding/` (#c8ff00 on dark, #6d8a00 on light), used as the site accent (D25).
-const BRAND = { onLight: "#6d8a00", onDark: "#c8ff00" };
+// Mintlify uses `primary` as a text colour in light mode (tab and code-block titles),
+// so light mode takes the darker ink #5a7300, which reaches WCAG AA (5.27:1 on neutral-1).
+const BRAND = { onLight: "#5a7300", onDark: "#c8ff00" };
 
 // docs.json: only `colors` and `background.color` are generated (D11.5, D25).
 // Compare parsed values, and on write replace just those two objects, so the

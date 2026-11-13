@@ -4,7 +4,8 @@
  * per mode through `light-dark()`; project colours come from the `data-accent`
  * scope of the element (D10, D25). */
 
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+/* JetBrains Mono, and the Space Grotesk weights docs.json does not load (it loads 700). */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
 
 html { color-scheme: light; }
 html.dark { color-scheme: dark; }
@@ -20,8 +21,11 @@ html.dark { color-scheme: dark; }
   --ws-dot: var(--line-neutral-4);
   --ws-text: var(--line-neutral-12);
   --ws-text-low: var(--line-neutral-11);
-  /* line://ui brand lime: #c8ff00 on dark, #6d8a00 on light (line-ui branding). */
+  --ws-brand-ink-light: #5a7300;
+  /* line://ui brand lime: #c8ff00 on dark, #6d8a00 on light (line-ui branding). Text in
+     light mode uses the darker ink so it reaches AA (D25). */
   --ws-brand: light-dark(#6d8a00, #c8ff00);
+  --ws-brand-ink: light-dark(var(--ws-brand-ink-light), #c8ff00);
   --ws-brand-fill: #c8ff00;
   --ws-on-brand: #111111;
 }
@@ -29,11 +33,14 @@ html.dark { color-scheme: dark; }
 /* Project colour of any element in a data-accent scope (dark step 10, D25). */
 [data-accent] {
   --ws-c: var(--line-accent-10);
-  --ws-c-strong: var(--line-accent-11);
+  /* Text in the project colour: step 11 on dark, step 12 on light (AA on neutral-1). */
+  --ws-c-strong: light-dark(var(--line-accent-12), var(--line-accent-11));
   --ws-c-soft: var(--line-accent-a3);
   --ws-c-line: var(--line-accent-a6);
-  --ws-on-c: var(--line-accent-1);
+  /* Label on a step-10 fill: black reaches AA on every hue except the dark-ink pair below. */
+  --ws-on-c: #000;
 }
+[data-accent="indigo"], [data-accent="purple"] { --ws-on-c: light-dark(#fff, #000); }
 
 code, kbd, pre, samp { font-family: var(--line-font-mono); }
 
@@ -55,22 +62,21 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
   background-image: radial-gradient(var(--ws-dot) 1px, transparent 1px);
   background-size: 24px 24px;
 }
-.ws-hero-project { min-height: 460px; }
+.ws-hero-project { min-height: 460px; border-bottom: 0; }
 .ws-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .ws-lines path { fill: none; stroke: var(--ws-c); }
 .ws-lines .ws-lines-base { opacity: 0.32; stroke-width: 1.5; }
 .ws-hero-project .ws-lines .ws-lines-base { opacity: 0.4; }
 .ws-lines .ws-pulse { stroke-width: 2; stroke-linecap: round; stroke-dasharray: 70 930; }
 .ws-hero-project .ws-lines .ws-pulse { stroke-width: 2.5; stroke-dasharray: 60 940; }
-.ws-shade-8 { --ws-c: var(--line-accent-8); }
 .ws-shade-9 { --ws-c: var(--line-accent-9); }
 .ws-shade-11 { --ws-c: var(--line-accent-11); }
 .ws-shade-12 { --ws-c: var(--line-accent-12); }
 .ws-hero-inner { position: relative; padding-top: 88px; padding-bottom: 120px; }
 .ws-hero-project .ws-hero-inner { padding-top: 56px; padding-bottom: 72px; }
-.ws-hero-copy { max-width: 700px; display: flex; flex-direction: column; gap: 24px; }
+.ws-hero-copy { max-width: 680px; display: flex; flex-direction: column; gap: 24px; }
 .ws-hero-project .ws-hero-copy { gap: 20px; }
-.ws-kicker { margin: 0; font-family: var(--line-font-mono); font-size: 13px; letter-spacing: 0.04em; color: var(--ws-brand); }
+.ws-kicker { margin: 0; font-family: var(--line-font-mono); font-size: 13px; letter-spacing: 0.04em; color: var(--ws-brand-ink); }
 .ws-crumb { font-family: var(--line-font-mono); font-size: 13px; color: var(--ws-text-low); }
 .ws-crumb a { text-decoration: none; color: var(--ws-text-low); }
 .ws-crumb a:hover { color: var(--ws-text); }
@@ -78,8 +84,9 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
 .ws-title { margin: 0; font-family: var(--ws-font-heading); font-weight: 700; font-size: 64px; line-height: 1.04; letter-spacing: -0.035em; color: var(--ws-text); }
 .ws-hero-project .ws-title { font-size: 76px; line-height: 1; letter-spacing: -0.04em; }
 .ws-title-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.ws-lede { margin: 0; max-width: 600px; font-size: 19px; line-height: 1.55; color: var(--ws-text-low); }
-.ws-hero-project .ws-lede { font-size: 20px; line-height: 1.5; }
+.ws-lede { margin: 0; max-width: 560px; font-size: 19px; line-height: 1.55; color: var(--ws-text-low); }
+.ws-hero-project .ws-hero-copy { max-width: 700px; }
+.ws-hero-project .ws-lede { max-width: 600px; font-size: 20px; line-height: 1.5; }
 .ws-stats { display: flex; flex-wrap: wrap; gap: 16px 48px; margin-top: 8px; }
 .ws-stat { display: grid; gap: 2px; }
 .ws-stat-value { font-family: var(--line-font-mono); font-size: 16px; font-weight: 600; color: var(--ws-text); }
@@ -101,7 +108,8 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
   font-weight: 600;
   text-decoration: none;
 }
-.ws-page a.ws-btn:hover { filter: brightness(1.08); }
+.ws-page a.ws-btn:hover { background: var(--line-neutral-3); }
+.ws-page a.ws-btn-brand:hover, .ws-page a.ws-btn-accent:hover { filter: brightness(1.08); }
 .ws-page a.ws-btn-brand { border-color: transparent; background: var(--ws-brand-fill); color: var(--ws-on-brand); }
 .ws-page a.ws-btn-accent { border-color: transparent; background: var(--ws-c); color: var(--ws-on-c); }
 .ws-btn svg { width: 16px; height: 16px; }
@@ -117,8 +125,8 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
   line-height: 1.5;
 }
 .ws-badge-lg { padding: 3px 10px; font-size: 12px; }
-.ws-badge-rc { color: var(--line-info-11); background: var(--line-info-3); border-color: var(--line-info-6); }
-.ws-badge-wip { color: var(--line-warning-11); background: var(--line-warning-3); border-color: var(--line-warning-6); }
+.ws-badge-rc { color: light-dark(var(--line-info-12), var(--line-info-11)); background: var(--line-info-3); border-color: var(--line-info-6); }
+.ws-badge-wip { color: light-dark(var(--line-warning-12), var(--line-warning-11)); background: var(--line-warning-3); border-color: var(--line-warning-6); }
 
 /* ── Hub sections ────────────────────────────────────────────────────── */
 .ws-section { padding: 72px 0 24px; }
@@ -132,6 +140,7 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
 .ws-featured-side { flex: 1 1 420px; min-width: 0; padding: 48px; box-sizing: border-box; border-left: 1px solid var(--ws-border); background: var(--ws-sunken); display: flex; flex-direction: column; justify-content: center; }
 .ws-featured-name { margin: 0; font-family: var(--ws-font-heading); font-size: 52px; font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; color: var(--ws-text); }
 .ws-featured-claim { margin: 0; max-width: 520px; font-size: 22px; line-height: 1.4; color: var(--ws-text); }
+.ws-featured .ws-meta { font-size: 13px; }
 .ws-featured-text { margin: 0; max-width: 520px; font-size: 16px; color: var(--ws-text-low); }
 .ws-term { border: 1px solid var(--ws-border); border-radius: 12px; background: var(--ws-bg); overflow: hidden; }
 .ws-term-head { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ws-border); font-family: var(--line-font-mono); font-size: 12px; color: var(--ws-text-low); }
@@ -139,9 +148,9 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
 .ws-term-body { padding: 20px; font-family: var(--line-font-mono); font-size: 14px; line-height: 1.9; overflow-x: auto; white-space: nowrap; color: var(--ws-text); }
 .ws-term-body p { margin: 0; }
 .ws-term-c { color: var(--ws-text-low); }
-.ws-term-gap { margin-top: 10px !important; }
-.ws-term-p { color: var(--ws-c); }
-.ws-term-v { color: var(--ws-brand); }
+.ws-term-body .ws-term-gap { margin-top: 10px; }
+.ws-term-p { color: var(--ws-c-strong); }
+.ws-term-v { color: var(--ws-brand-ink); }
 
 /* ── Bento grid of project cards ─────────────────────────────────────── */
 .ws-bento { display: grid; gap: 20px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -166,14 +175,11 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
   color: var(--ws-c);
   background-color: var(--ws-bg);
   background-image: radial-gradient(var(--ws-dot) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-size: 16px 16px;
 }
 .ws-art .ws-art-base { fill: none; stroke: currentColor; stroke-width: 1.5; opacity: 0.45; transition: opacity 0.2s ease; }
 .ws-pcard:hover .ws-art .ws-art-base { opacity: 1; }
 .ws-art .ws-pulse { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 50 950; }
-.ws-art .ws-art-node { stroke: currentColor; stroke-width: 1.5; fill: var(--ws-bg); }
-.ws-art .ws-art-fill { fill: currentColor; }
-.ws-art .ws-art-mark { fill: none; stroke: var(--ws-bg); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .ws-pcard-body { display: flex; flex: 1; flex-direction: column; gap: 12px; padding: 24px; border-top: 1px solid var(--ws-border); }
 .ws-pcard-head { display: flex; align-items: center; gap: 10px; }
 .ws-pcard-name { font-family: var(--line-font-mono); font-size: 21px; font-weight: 600; }
@@ -189,18 +195,19 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
 .ws-page .ws-footer a:hover { color: var(--ws-text); }
 
 /* ── Project overview: three-column body ─────────────────────────────── */
-.ws-doc { display: flex; flex-wrap: wrap; gap: 48px; padding-top: 56px; padding-bottom: 96px; }
-.ws-docnav { flex: 0 0 200px; position: sticky; top: 88px; align-self: flex-start; display: flex; flex-direction: column; gap: 4px; }
+.ws-doc { display: flex; flex-wrap: wrap; gap: 48px 64px; padding-top: 56px; padding-bottom: 96px; }
+.ws-docnav { flex: 0 0 200px; position: sticky; top: 88px; align-self: flex-start; max-height: calc(100vh - 112px); overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
 .ws-docnav .ws-label { margin: 16px 0 4px; }
 .ws-docnav .ws-label:first-child { margin-top: 0; }
 .ws-page .ws-docnav a {
   display: flex;
   align-items: center;
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 12px;
   border: 1px solid transparent;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
   color: var(--ws-text-low);
   text-decoration: none;
 }
@@ -209,7 +216,7 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
 .ws-docbody { flex: 999 1 560px; min-width: 0; max-width: 780px; }
 .ws-docbody h2 { font-family: var(--ws-font-heading); font-size: 32px; letter-spacing: -0.02em; scroll-margin-top: 88px; }
 .ws-toc { flex: 0 0 200px; position: sticky; top: 88px; align-self: flex-start; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
-.ws-page .ws-toc a { display: flex; align-items: center; min-height: 32px; color: var(--ws-text-low); text-decoration: none; }
+.ws-page .ws-toc a { display: flex; align-items: center; min-height: 44px; color: var(--ws-text-low); text-decoration: none; }
 .ws-page .ws-toc a:hover { color: var(--ws-c-strong); }
 
 /* ── Motion: CSS only, off for reduced motion ────────────────────────── */
@@ -223,6 +230,11 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
 .ws-t5 { animation-duration: 13s; animation-delay: -9s; }
 .ws-t6 { animation-duration: 9.5s; animation-delay: -4s; }
 .ws-t7 { animation-duration: 11s; animation-delay: -6s; }
+.ws-p1 { animation-duration: 8s; animation-delay: -1s; }
+.ws-p2 { animation-duration: 10s; animation-delay: -6s; }
+.ws-p3 { animation-duration: 7s; animation-delay: -3s; }
+.ws-p4 { animation-duration: 11s; animation-delay: -8s; }
+.ws-p5 { animation-duration: 9s; animation-delay: -4.5s; }
 .ws-d2 { animation-delay: -2s; }
 .ws-d3 { animation-delay: -3s; }
 .ws-d4 { animation-delay: -4s; }
@@ -231,15 +243,24 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
   .ws-page a.ws-pcard, .ws-go { transition: none; }
 }
 
+/* ── Anchors and sticky columns clear Mintlify's navbar (64 px; 120 px below 1024 px) ── */
+#projects { scroll-margin-top: 88px; }
+@media (max-width: 1023px) {
+  #projects, .ws-docbody h2 { scroll-margin-top: 136px; }
+  .ws-docnav, .ws-toc { top: 136px; }
+  .ws-docnav { max-height: calc(100vh - 160px); }
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────── */
-@media (max-width: 1100px) {
+/* The three columns need 200 + 64 + 560 + 64 + 200 px plus padding. */
+@media (max-width: 1160px) {
   .ws-toc { display: none; }
 }
 @media (max-width: 1000px) {
   .ws-s3, .ws-s2 { grid-column: span 3; }
 }
-@media (max-width: 860px) {
-  .ws-docnav { position: static; flex-basis: 100%; }
+@media (max-width: 900px) {
+  .ws-docnav { position: static; flex-basis: 100%; max-height: none; }
 }
 @media (max-width: 760px) {
   .ws-lines { opacity: 0.3; }

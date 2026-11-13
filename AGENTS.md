@@ -35,11 +35,11 @@ Projects documented: delta, trunks, vite-open-api-server, unblock, workspace-too
 - **Documented version (D5).** Latest stable release. Exceptions: trunks uses its latest RC tag, focus uses `main`, line-ui uses only what is published on npm.
 - **English only** on the site (D4).
 - **Styling (D11, D25).**
-  - Every custom component declares `data-accent` (and `data-gray="neutral"`).
+  - Every project-coloured component declares its `data-accent` (and `data-gray="neutral"`); site-wide pieces use the brand tokens.
   - No `line-` class prefixes on markup that is not from line.
   - Static parts are HTML in MDX; JSX is for interactive parts only.
   - Hub and project overviews are full-width `mode: "custom"` pages; other pages use the standard layout.
-  - Mintlify drops `<nav>`, `<main>`, `<article>`, `<footer>` and SVG `<circle>` from MDX: use `<div role="…">` and `<path>` arcs. Write `{"$"}` for a literal `$` outside code (KaTeX).
+  - Mintlify drops `<nav>`, `<main>`, `<article>`, `<footer>` and SVG `<circle>` from MDX: use `<div>` (with `role="navigation"` for navigation only; Mintlify already provides `main`) and `<path>` arcs. Write `{"$"}` for a literal `$` outside code (KaTeX).
 
 ## Checks
 
