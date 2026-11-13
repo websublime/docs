@@ -79,6 +79,11 @@ projects:
             - crates/focus-harness/src/lib.rs
             - crates/focus-cli/src/log.rs
             - crates/focus-log/src/lib.rs
+            - crates/focus-evidence/src/source/snapshot.rs
+            - crates/focus-log/src/answer_text.rs
+            - crates/focus-intent/src/create.rs
+            - crates/focus-lifecycle/src/jump.rs
+            - crates/focus-lifecycle/src/transitions.rs
   - slug: line-ui
     name: line://ui
     repo: websublime/line-ui
