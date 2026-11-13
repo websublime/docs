@@ -10,6 +10,7 @@ This is how an agent, or a human, keeps the project pages in step with each proj
 | `bun scripts/sync.ts --project <slug> --json` | The same for one project, as JSON |
 | `bun scripts/sync.ts --mark-synced <slug> [--at <sha>]` | Sets `lastSynced` to what the local checkout resolves each source's ref to, without fetching. For a single-source project, `--at <sha>` records that exact commit instead |
 | `bun scripts/sync.ts --validate` | Checks the registry structure and that every watched page exists (runs in CI) |
+| `bun scripts/nav.ts [--check]` | Regenerates each project's navigation snippet (`snippets/nav/<slug>.mdx`) from `docs.json`; run it after adding or renaming a page (D25) |
 | `bun scripts/leak-lint.ts` | Fails on internal material in published files (D3; runs in CI) |
 | `bun scripts/gen.ts [--project <slug>] [--check]` | Writes the generated pages declared in the registry from their source files at `lastSynced`. In CI, `--check` fails when a page differs (D24) |
 

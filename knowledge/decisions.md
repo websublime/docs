@@ -129,7 +129,7 @@ Agents and humans read it before they change anything in this repository.
 
 ## D9: Visual foundation is the line://ui design system with the websublime brand
 
-- **Status:** accepted (2026-11-12, conversation)
+- **Status:** superseded by D25 for brand colour, chrome colours and fonts (2026-11-12). The use of the line://ui packages stands.
 - **Decision:**
   - The site uses `@websublime/line-tokens`, `@websublime/line-colors` and `@websublime/line-themes`.
   - The websublime brand (logos in `../websublime-site/design/Logo/`, ink `#242320`) maps onto the line `sand` scale. `sand-12` is `#21201c`, practically the same as the brand ink.
@@ -148,12 +148,12 @@ Agents and humans read it before they change anything in this repository.
 
 ## D10: Accent colour of each project
 
-- **Status:** accepted (2026-11-12, conversation)
+- **Status:** accepted (2026-11-12, conversation). Amended by D25: the hues stand, but lines, borders and buttons use step 10 and text uses step 11.
 - **Decision:** Each project section uses one line hue as its accent, through `data-accent`. The green, amber, red and blue hues are kept for the success, warning, danger and info roles and are never used as a project accent.
 
   | Project | Hue | Step 9 | Auto-paired gray | Reason |
   |---|---|---|---|---|
-  | hub (websublime) | sand | `#21201c` (sand-12) | sand | brand ink |
+  | hub (websublime) | sand (superseded by D25: the hub uses the line://ui brand lime) | `#21201c` (sand-12) | sand | brand ink |
   | trunks | teal | `#12a594` | sage | matches its favicon gradient |
   | line-ui | lime | `#bdee63` | olive | closest to its brand `#c8ff00`, which is off the scale |
   | unblock | orange | `#f76b15` | sand | its palette is orange (`#b95f14`, off the scale); amber is reserved for warnings |
@@ -179,7 +179,7 @@ Agents and humans read it before they change anything in this repository.
 
 ## D12: Navigation and layout
 
-- **Status:** accepted (2026-11-12, conversation)
+- **Status:** accepted (2026-11-12, conversation). Amended by D25: the Hub and the project overviews are full-width custom pages, and the overviews no longer use `<Panel>`.
 - **Decision:**
   - **Navigation:** `navigation.products` has one product for the hub and one per project. Inside a project, groups follow the project's page tree (`knowledge/projects/<slug>.md`, section 5).
   - **Hub** (`index`, `mode: wide`) contains:
@@ -275,16 +275,16 @@ Agents and humans read it before they change anything in this repository.
 - **Decision:**
   1. **Overview pages.** Every project gets a minimal Overview page now, at `<slug>/overview`, written from its sources at the D5 ref. The page covers identity, install, a quick example when verified, status for RC and WIP projects, and links. This means every `navigation.products` entry exists from the start. Fuller pages arrive with each project's sync intent.
   2. **Featured project:** the hub features **trunks**.
-  3. **Logo:** the `websublime` wordmark (`logo/websublime-black.svg` and `logo/websublime-white.svg`, from `websublime-site/design/Logo/`). The favicon is the `ws` mark (`logo/ws-black.svg` and `logo/ws-white.svg`). The white variants originally had a dark `#242320` background plate and border rectangle (Sketch `Fill-1` and `Stroke-2`). Both were removed from the copies, so the mark sits on the site's own dark background.
+  3. **Logo** (superseded by D25.5, which uses the "websublime ://docs" wordmark): the `websublime` wordmark (`logo/websublime-black.svg` and `logo/websublime-white.svg`, from `websublime-site/design/Logo/`). The favicon is the `ws` mark (`logo/ws-black.svg` and `logo/ws-white.svg`). The white variants originally had a dark `#242320` background plate and border rectangle (Sketch `Fill-1` and `Stroke-2`). Both were removed from the copies, so the mark sits on the site's own dark background.
   4. **Stats:** heroes and cards show static data for now: version, license and stack. Stars and downloads come with the sync tooling.
-  5. **Generated assets:** `scripts/line-ui.mjs` copies the pinned stylesheets (`scripts/line-ui.versions.json`) into `styles/line-*.css` and writes `docs.json` `colors`/`background` from the sand scale:
+  5. **Generated assets** (amended by D25: the colours now come from the brand lime and `neutral-1`): `scripts/line-ui.mjs` copies the pinned stylesheets (`scripts/line-ui.versions.json`) into `styles/line-*.css` and writes `docs.json` `colors`/`background` from the sand scale:
      - `primary` = sand-12 light;
      - `light` = sand-12 dark;
      - `dark` = sand-11 light, which is visible as a button colour in both modes;
      - backgrounds = sand-1.
 
      CI runs `--check`. This settles the `colors.dark` choice that D9 left open.
-  6. **Custom markup:** classes use the `ws-` prefix and live in `styles/site.css`. Wrappers carry `not-prose`, so Mintlify typography leaves them alone. Status badges use the warning role for WIP and the info role for RC (D8).
+  6. **Custom markup** (amended by D25: the full-width pages no longer use `not-prose` wrappers, and the content sits in a `prose` column): classes use the `ws-` prefix and live in `styles/site.css`. Wrappers carry `not-prose`, so Mintlify typography leaves them alone. Status badges use the warning role for WIP and the info role for RC (D8).
   7. **Product order:** the Hub first, then the projects in alphabetical order.
 - **Why:** Miguel's choices on issue #3.
 
@@ -310,7 +310,7 @@ Agents and humans read it before they change anything in this repository.
   - **Designs versus the documented version.** A design that shows a version other than the documented one (D5) is published only with a `<Note>` saying it is a design and that the documented release may look different.
   - **Design-system sheets are not published.** Component specs, patterns and tokens are internal design material (D3).
   - **Accessibility.** Every image has alt text describing what the screen shows, and a caption.
-- **First use:** the Trunks web-console designs (version 0.4.0 in the mockups) on `trunks/overview`. They are the Overview screen after the hero, plus Servers, Register, Tools, Tool groups, MCP clients and Diagnostics in a "Web console" section. The New components, Patterns and Tokens sheets were left out.
+- **First use:** the Trunks web-console designs (version 0.4.0 in the mockups) on `trunks/overview`. They are the Overview screen (after the hero; since D25, after the Overview paragraph), plus Servers, Register, Tools, Tool groups, MCP clients and Diagnostics in a "Web console" section. The New components, Patterns and Tokens sheets were left out.
 
 ## D23: Sync tooling
 
@@ -368,3 +368,48 @@ Agents and humans read it before they change anything in this repository.
   - `keep-a-changelog` ignores headings inside code fences, reads linked headings, en-dash dates and `[YANKED]`, and removes only the version link definitions.
   - `--project` with an unknown slug fails. A full `--check` also fails on an orphan generated page, meaning one that has the generated header but no registry entry.
   - Tested by compiling edge cases with `@mdx-js/mdx`.
+
+## D25: Redesign: dark-first, full-width, animated, on line://ui
+
+- **Status:** accepted (2026-11-12, issue #11).
+  - Supersedes D9 (brand and fonts).
+  - Amends D10 (which step is used), D12 (layout) and D20.3 (logo).
+- **Source:** `knowledge/research/websublime docs — redesign.html` (Hub and Trunks overview mockups), and Miguel's answers on issue #11.
+- **Decision:**
+  1. **Brand.**
+     - The line://ui brand lime is the site accent: `#c8ff00` on dark, `#6d8a00` on light. These are the line-ui `branding/` inks.
+     - In `docs.json`, `colors.primary` is `#5a7300`, `light` is `#c8ff00` and `dark` is `#5a7300`. Mintlify uses `primary` as a text colour in light mode, and `#6d8a00` reaches only 3.87:1 there. Miguel chose the AA-compliant darker ink on PR #12. `#6d8a00` stays for brand fills and lines in our own CSS. The page background is line `neutral-1` (`#fcfcfc` / `#111`). `scripts/line-ui.mjs` generates these values.
+     - Site greys come from the line `neutral` scale (`data-gray="neutral"`).
+  2. **Modes.** Dark is the default (`appearance.default: dark`). Light mode is also supported, through line `light-dark()` tokens. All custom CSS uses tokens, never fixed per-mode hex values. The exceptions are the brand inks, which are not palette steps, and the label colour on a step-10 fill.
+  3. **Project colours.** The hue stays per D10. Lines, borders, buttons and dots use **step 10** (`--line-accent-10`, the alias `solid-hover`). On dark, step 10 is closest to the mockup.
+     - **Coloured text** uses step 11 on dark and step 12 on light, which keeps it above 4.5:1 (WCAG AA).
+     - **Labels on step-10 buttons** are black, except indigo and purple in light mode, which are white. Every combination is at least 4.8:1.
+     - **Brand-lime text** in light mode uses the darker ink `#5a7300` (5.27:1 on neutral-1). `#6d8a00` is kept for fills and lines.
+  4. **Fonts.**
+     - Space Grotesk 700 for headings, via `docs.json` `fonts.heading`.
+     - Inter for body text, via `fonts.body`.
+     - JetBrains Mono for labels and code, via `@import` in `styles/site.css`, set as `--line-font-mono`.
+  5. **Wordmark.** `logo/wordmark-{dark,light}.svg` reads "websublime ://docs", with every glyph outlined (no font dependency).
+     - "web" is Space Grotesk 700 and "sublime" is Space Grotesk 500, both 22 px with -0.02em tracking.
+     - "://docs" is JetBrains Mono 400 at 13 px, 8 px after "sublime", on the same baseline.
+     - Ink is `#EEEEEE` / `#202020`, and lime is `#C8FF00` / `#6D8A00`.
+     - The outlines were made with fontTools from the Google Fonts variable TTFs. The favicon is still the `ws` mark.
+  6. **Hub** (`index`, `mode: custom`):
+     - a full-width hero with seven animated lines, one per project hue;
+     - the featured project (Trunks) with a terminal panel;
+     - a bento grid with one animated SVG illustration per project;
+     - a footer that also links "Contribute to these docs" and "Report a docs problem".
+  7. **Project overviews** (`mode: custom`):
+     - a full-width hero with five animated lines in the project's shades, a breadcrumb, the title and badge, the description as lede, stats, and Install/GitHub buttons;
+     - a three-column body: the navigation snippet, the content (`prose`), and an "On this page" index;
+     - Install, Contribute (the former `<Panel>` content) and Links as sections. Headings carry explicit ids, because custom mode does not generate them.
+  8. **Project navigation** is generated from `docs.json` by `scripts/nav.ts` into `snippets/nav/<slug>.mdx`. CI runs `--check`, which also fails on orphan snippets.
+  9. **All other pages** keep the standard Mintlify layout, themed by `docs.json` and `styles/site.css`.
+  10. **Motion** is CSS only: `stroke-dashoffset` on SVG paths, plus hover transitions. It is switched off under `prefers-reduced-motion`.
+- **Mintlify constraints found while building:**
+  - `<nav>`, `<main>`, `<article>` and `<footer>` are dropped from MDX. Use `<div>` instead. Add `role="navigation"` to navigation blocks only: Mintlify already wraps the page in `<main>`, so a second `main` or a nested `contentinfo` landmark breaks the landmark structure (axe).
+  - SVG `<circle>` is dropped. Use a two-arc `<path>`.
+  - A `$` in MDX prose or JSX text starts KaTeX. Write `{"$"}`.
+  - Custom mode keeps the navbar, search and product switcher, but drops the sidebar, the table of contents, `<Panel>`, the footer and the heading ids.
+  - The `prose` class restores the standard typography inside a custom page.
+- **Why:** Miguel asked for this redesign while keeping line://ui. The mockup's own hex colours and fonts were mapped onto line tokens wherever a token exists.

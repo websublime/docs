@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Copies the pinned line://ui stylesheets into styles/ and derives the
-// docs.json chrome colours from the line `sand` scale (D9, D11).
+// docs.json chrome colours: the line://ui brand lime as accent, and the page
+// background from the line `neutral` scale (D25, D11).
 //
 //   node scripts/line-ui.mjs          write styles/line-*.css and docs.json colours
 //   node scripts/line-ui.mjs --check  exit 1 if either is out of date (CI)
@@ -39,25 +40,30 @@ try {
   rmSync(work, { recursive: true, force: true });
 }
 
-// Base sRGB steps are declared as `--line-sand-N:light-dark(#light,#dark)`.
-function step(n) {
-  const m = colorsCss.match(new RegExp(`--line-sand-${n}:\\s*light-dark\\((#[0-9a-fA-F]{6}),\\s*(#[0-9a-fA-F]{6})\\)`));
-  if (!m) throw new Error(`sand-${n} not found in line-colors`);
+// Base sRGB steps are declared as `--line-<hue>-N:light-dark(#light,#dark)`; the
+// minifier may shorten a hex to 3 digits, which docs.json does accept.
+function step(hue, n) {
+  const hex = "#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}";
+  const m = colorsCss.match(new RegExp(`--line-${hue}-${n}:\\s*light-dark\\((${hex}),\\s*(${hex})\\)`));
+  if (!m) throw new Error(`${hue}-${n} not found in line-colors`);
   return { light: m[1].toLowerCase(), dark: m[2].toLowerCase() };
 }
-const sand1 = step(1);
-const sand11 = step(11);
-const sand12 = step(12);
+const neutral1 = step("neutral", 1);
+// The line://ui brand lime is not a palette step: it is the brand ink from
+// line-ui `branding/` (#c8ff00 on dark, #6d8a00 on light), used as the site accent (D25).
+// Mintlify uses `primary` as a text colour in light mode (tab and code-block titles),
+// so light mode takes the darker ink #5a7300, which reaches WCAG AA (5.27:1 on neutral-1).
+const BRAND = { onLight: "#5a7300", onDark: "#c8ff00" };
 
-// docs.json: only `colors` and `background.color` are generated (D11.5, D20.5).
+// docs.json: only `colors` and `background.color` are generated (D11.5, D25).
 // Compare parsed values, and on write replace just those two objects, so the
 // rest of the file keeps its hand-written formatting.
 const docsPath = join(root, "docs.json");
 let docsText = readFileSync(docsPath, "utf8");
 const docs = JSON.parse(docsText);
 const generated = {
-  colors: { primary: sand12.light, light: sand12.dark, dark: sand11.light },
-  background: { ...(docs.background ?? {}), color: { light: sand1.light, dark: sand1.dark } },
+  colors: { primary: BRAND.onLight, light: BRAND.onDark, dark: BRAND.onLight },
+  background: { ...(docs.background ?? {}), color: { light: neutral1.light, dark: neutral1.dark } },
 };
 
 // Replace the value of a top-level `"key": { ... }` object, keeping its indentation.

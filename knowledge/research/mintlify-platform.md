@@ -76,3 +76,15 @@ On pull requests in `websublime/docs`, the Mintlify GitHub App reports `Mintlify
 | `mint a11y` | accessibility checks |
 | `mint dev` | local preview |
 | `mint agent setup --agent <claude-code\|codex\|cursor>` | installs Mintlify skills and the admin MCP server |
+
+## Custom mode in practice (2026-11-12, `mint dev` 4.3.19, redesign)
+
+- **Kept:** the navbar, search, the Assistant entry and the product switcher. `appearance.strict` hides the theme toggle.
+- **Removed:** the sidebar, the table of contents, `<Panel>`, the page footer and heading ids.
+- **Width:** content spans the full viewport (checked: a 1440 px section at `left: 0`).
+- **Components:** Mintlify components (`Tabs`, `CodeGroup`, `Steps`, `Frame`, `Note`, `Columns`, `Card`) still render. Typography needs the `prose dark:prose-invert` classes on a wrapper.
+- **Snippets:** an MDX snippet imported with `import Nav from "/snippets/nav/x.mdx"` renders on the server.
+- **Dropped from MDX:** `<nav>`, `<main>`, `<article>`, `<footer>` and SVG `<circle>`. The rest of the subtree survives, but these elements disappear. Use `<div role=…>` and arc paths.
+- **KaTeX:** a `$` in prose or JSX text is parsed as math (`mint validate` warns). Use `{"$"}`.
+- **SVG:** SVG `pathLength`, `viewBox` and CSS `@keyframes` on `stroke-dashoffset` render on the server and animate.
+- **Fonts:** `fonts.heading` / `fonts.body` load Google Fonts. A third family loads through `@import` in a content-directory CSS file.

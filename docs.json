@@ -4,20 +4,32 @@
   "name": "websublime",
   "description": "Documentation for websublime's open-source projects.",
   "colors": {
-    "primary": "#21201c",
-    "light": "#eeeeec",
-    "dark": "#63635e"
+    "primary": "#5a7300",
+    "light": "#c8ff00",
+    "dark": "#5a7300"
   },
   "background": {
     "color": {
-      "light": "#fdfdfc",
-      "dark": "#111110"
+      "light": "#fcfcfc",
+      "dark": "#111"
     }
   },
   "logo": {
-    "light": "/logo/websublime-black.svg",
-    "dark": "/logo/websublime-white.svg",
+    "light": "/logo/wordmark-light.svg",
+    "dark": "/logo/wordmark-dark.svg",
     "href": "/"
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "fonts": {
+    "heading": {
+      "family": "Space Grotesk",
+      "weight": 700
+    },
+    "body": {
+      "family": "Inter"
+    }
   },
   "favicon": {
     "light": "/logo/ws-black.svg",

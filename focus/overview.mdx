@@ -2,30 +2,62 @@
 title: "Focus"
 sidebarTitle: "Overview"
 description: "A Rust engine for AI-DLC: stages, scopes, approval gates and an audit trail for your AI coding assistant."
+mode: "custom"
 tag: "WIP"
 ---
 
-<div className="not-prose ws-hero" data-accent="crimson">
-  <div className="ws-hero-head">
-    <span className="ws-badge ws-badge-wip">WIP</span>
-    <p className="ws-hero-tagline">A Rust engine that turns your AI coding assistant into a gated, audited delivery workflow.</p>
+import Nav from "/snippets/nav/focus.mdx";
+
+<div className="ws-page" data-accent="crimson" data-gray="neutral">
+
+<section className="ws-hero ws-hero-project" id="top">
+  <svg className="ws-lines" aria-hidden="true" viewBox="0 0 1440 460" preserveAspectRatio="none">
+    <g className="ws-lines-base">
+      <path className="ws-shade-11" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-12" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-9" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-shade-11" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+    <g>
+      <path className="ws-pulse ws-p1 ws-shade-11" pathLength="1000" d="M1440,50 C1160,50 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-p2" pathLength="1000" d="M1440,130 C1160,130 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-p3 ws-shade-12" pathLength="1000" d="M1440,210 C1160,210 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-p4 ws-shade-9" pathLength="1000" d="M1440,290 C1160,290 1120,458 820,458 L0,458"/>
+      <path className="ws-pulse ws-p5 ws-shade-11" pathLength="1000" d="M1440,370 C1160,370 1120,458 820,458 L0,458"/>
+    </g>
+  </svg>
+  <div className="ws-wrap ws-hero-inner">
+    <div className="ws-hero-copy">
+      <div className="ws-crumb" role="navigation" aria-label="Breadcrumb"><a href="/">docs://websublime</a> / <span>focus</span></div>
+      <div className="ws-title-row"><h1 className="ws-title">Focus</h1><span className="ws-badge ws-badge-lg ws-badge-wip">WIP</span></div>
+      <p className="ws-lede">A Rust engine for AI-DLC: stages, scopes, approval gates and an audit trail for your AI coding assistant.</p>
+      <div className="ws-stats">
+        <div className="ws-stat"><span className="ws-label">Version</span><span className="ws-stat-value">0.1.0 (unreleased)</span></div>
+        <div className="ws-stat"><span className="ws-label">License</span><span className="ws-stat-value">MIT</span></div>
+        <div className="ws-stat"><span className="ws-label">Stack</span><span className="ws-stat-value">Rust · AI-DLC</span></div>
+      </div>
+      <div className="ws-actions">
+        <a className="ws-btn ws-btn-accent" href="#install">Install</a>
+        <a className="ws-btn" href="https://github.com/websublime/focus">GitHub</a>
+      </div>
+    </div>
   </div>
-  <div className="ws-stats">
-    <div className="ws-stat"><span className="ws-stat-label">Version</span><span className="ws-stat-value">0.1.0 (unreleased)</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">License</span><span className="ws-stat-value">MIT</span></div>
-    <div className="ws-stat"><span className="ws-stat-label">Stack</span><span className="ws-stat-value">Rust · AI-DLC</span></div>
-  </div>
-  <div className="ws-actions">
-    <a className="ws-button ws-button-solid" href="https://github.com/websublime/focus">GitHub</a>
-    <a className="ws-button" href="#install">Install</a>
-  </div>
-</div>
+</section>
+
+<div className="ws-wrap ws-doc">
+
+<Nav />
+
+<div className="ws-docbody prose dark:prose-invert">
+
+<h2 id="overview">Overview</h2>
 
 Focus is a Rust engine for AI-DLC (AI-Driven Development Life Cycle). AI-DLC organizes your work with a coding assistant into stages grouped by phase and selected by a scope, with human approval gates and an audit trail. Focus targets Claude Code, Cursor and GitHub Copilot. It is for developers who run AI-DLC workflows and for contributors to the engine.
 
 Focus is a fork of [`awslabs/aidlc-workflows`](https://github.com/awslabs/aidlc-workflows), frozen at upstream version 2.11.0, commit `2a555f7a4387cd1b8254029cccb9fd1e99974574`, and checked for parity against it.
 
-## What you can do
+<h2 id="what-you-can-do">What you can do</h2>
 
 - Compile and query the stage graph with `focus engine graph`: dependency order, the stages of a scope, artifact producers and consumers, plan validation and export.
 - Append to and read the audit ledger with `focus engine audit`, and compile the runtime graph of a workflow with `focus engine runtime`.
@@ -34,7 +66,7 @@ Focus is a fork of [`awslabs/aidlc-workflows`](https://github.com/awslabs/aidlc-
 - Start a piece of work and inspect the project with `focus engine utility intent-create`, `detect`, `now` and `status`.
 - Run harness hooks on a host payload with `focus engine hook <name>`, for example `session-start` or `session-end`.
 
-## Install
+<h2 id="install">Install</h2>
 
 Focus has no release yet. Build it from source with Rust 1.89 or later:
 
@@ -46,7 +78,7 @@ cargo build --release
 
 The binary is `target/release/focus`. There is no harness installer yet: Focus does not create the `.claude/`, `.cursor/` or `focus/` trees in your project. {/* leak-lint: allow .claude/ is the harness directory Focus targets, not an agent file of this site */}
 
-## Quick example
+<h2 id="quick-example">Quick example</h2>
 
 Compile the stage graph from the bundled upstream Markdown, outside any project:
 
@@ -60,7 +92,7 @@ Inside a project with a harness installed, list the stages a scope runs:
 focus engine graph scope bugfix
 ```
 
-## Status
+<h2 id="status">Status</h2>
 
 - **Works:** the stage graph, the audit ledger, the runtime graph, the workflow state file with its transitions, gates and jumps, creating a piece of work, settings files, and 12 harness hooks plus the `guard-tool-call` group.
 - **Not yet:** the orchestrator. Checks that depend on it are refused by name.
@@ -68,33 +100,49 @@ focus engine graph scope bugfix
 - **Not available:** published binaries, installers and a harness installer. Adapters for Cursor and GitHub Copilot do not exist yet, so in practice only Claude Code hooks work.
 - `graph resolve` runs only when `FOCUS_GRAPH_RESOLVE=1` is set.
 
-## Links
+<h2 id="contribute">Contribute</h2>
+
+<Steps>
+  <Step title="Fork and branch">
+    Fork `websublime/focus` and create a short-lived branch from `main`.
+  </Step>
+  <Step title="Run the checks">
+    Run `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings` and `cargo test --workspace`.
+  </Step>
+  <Step title="Open a pull request">
+    Open a pull request against `main`. It merges only when CI passes on Linux, macOS and Windows.
+  </Step>
+</Steps>
+
+<Tip>`cargo test` replays the parity fixtures without Bun or an upstream checkout.</Tip>
+
+<h2 id="links">Links</h2>
 
 - [GitHub repository](https://github.com/websublime/focus)
 - [README at `main`](https://github.com/websublime/focus/blob/main/README.md)
 - [License](https://github.com/websublime/focus/blob/main/LICENSE)
 - [Upstream: awslabs/aidlc-workflows](https://github.com/awslabs/aidlc-workflows)
 
-<Panel>
-  <h3>Install</h3>
+</div>
 
-  ```bash
-  cargo build --release
-  ```
+<div className="ws-toc" role="navigation" aria-label="On this page">
+  <p className="ws-label">On this page</p>
+  <a href="#overview">Overview</a>
+  <a href="#what-you-can-do">What you can do</a>
+  <a href="#install">Install</a>
+  <a href="#quick-example">Quick example</a>
+  <a href="#status">Status</a>
+  <a href="#contribute">Contribute</a>
+  <a href="#links">Links</a>
+</div>
 
-  <h3>Contribute</h3>
+</div>
 
-  <Steps>
-    <Step title="Fork and branch">
-      Fork `websublime/focus` and create a short-lived branch from `main`.
-    </Step>
-    <Step title="Run the checks">
-      Run `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings` and `cargo test --workspace`.
-    </Step>
-    <Step title="Open a pull request">
-      Open a pull request against `main`. It merges only when CI passes on Linux, macOS and Windows.
-    </Step>
-  </Steps>
+<div className="ws-footer">
+  <div className="ws-wrap ws-footer-inner">
+    <a className="ws-mono" href="/">← docs://websublime</a>
+    <a href="https://github.com/websublime/focus">GitHub</a>
+  </div>
+</div>
 
-  <Tip>`cargo test` replays the parity fixtures without Bun or an upstream checkout.</Tip>
-</Panel>
+</div>
