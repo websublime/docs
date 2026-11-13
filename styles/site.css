@@ -108,7 +108,9 @@ code, kbd, pre, samp { font-family: var(--line-font-mono); }
   font-weight: 600;
   text-decoration: none;
 }
-.ws-page a.ws-btn:hover { background: var(--line-neutral-3); }
+/* Neutral hover only for the plain button: on brand/accent buttons a background change
+   would outrank their fill (higher specificity) and leave dark text on a dark grey. */
+.ws-page a.ws-btn:not(.ws-btn-brand):not(.ws-btn-accent):hover { background: var(--line-neutral-3); }
 .ws-page a.ws-btn-brand:hover, .ws-page a.ws-btn-accent:hover { filter: brightness(1.08); }
 .ws-page a.ws-btn-brand { border-color: transparent; background: var(--ws-brand-fill); color: var(--ws-on-brand); }
 .ws-page a.ws-btn-accent { border-color: transparent; background: var(--ws-c); color: var(--ws-on-c); }
