@@ -55,7 +55,7 @@ projects:
         tagPattern: null
         branch: origin/main
         ref: origin/main
-        lastSynced: ce229fc444c8750e24b9551aa9ac734a1c7b1642
+        lastSynced: c0fc99eac46680d144b1515060dca52e46194656
         watch:
           focus/overview:
             - README.md
@@ -77,6 +77,13 @@ projects:
             - crates/focus-hooks/src/lib.rs
             - crates/focus-hooks/src/group.rs
             - crates/focus-harness/src/lib.rs
+            - crates/focus-cli/src/log.rs
+            - crates/focus-log/src/lib.rs
+            - crates/focus-evidence/src/source/snapshot.rs
+            - crates/focus-log/src/answer_text.rs
+            - crates/focus-intent/src/create.rs
+            - crates/focus-lifecycle/src/jump.rs
+            - crates/focus-lifecycle/src/transitions.rs
   - slug: line-ui
     name: line://ui
     repo: websublime/line-ui

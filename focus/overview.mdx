@@ -63,6 +63,7 @@ Focus is a fork of [`awslabs/aidlc-workflows`](https://github.com/awslabs/aidlc-
 - Append to and read the audit ledger with `focus engine audit`, and compile the runtime graph of a workflow with `focus engine runtime`.
 - Move a workflow through its stages and approval gates with `focus engine state`: `advance`, `skip`, `gate-start`, `approve`, `reject`, `park` and more.
 - Jump to another stage with `focus engine jump resolve` and `focus engine jump execute`.
+- Record the questions the agent asks and the person's replies in the ledger, and read a stage's questions back with their answers, with `focus engine log decision`, `log answer` and `log answers`.
 - Start a piece of work and inspect the project with `focus engine utility intent-create`, `detect`, `now` and `status`.
 - Run harness hooks on a host payload with `focus engine hook <name>`, for example `session-start` or `session-end`.
 
@@ -95,8 +96,11 @@ focus engine graph scope bugfix
 <h2 id="status">Status</h2>
 
 - **Works:** the stage graph, the audit ledger, the runtime graph, the workflow state file with its transitions, gates and jumps, creating a piece of work, settings files, and 12 harness hooks plus the `guard-tool-call` group.
-- **Not yet:** the orchestrator. Checks that depend on it are refused by name.
-- **Refused as not ported:** 30 `utility` verbs (for example `doctor`, `init`, `intent`, `space`), `jump reopen`, and 3 hooks: `continue-workflow`, `deliver-stage-rules` and `fold-usage`.
+- **First pieces of the orchestrator:**
+  - `log decision`, `log answer` and `log answers` record questions and answers. An answer can come from a file the agent writes under `.focus-engine/answer-text/` in the record; Focus reads it once and deletes it.
+  - Creating a piece of work, a jump and the start of a stage that produces code record the project's source baseline: a `Source Baseline` field on the ledger row, with the source listing saved under `.focus-engine/source-review/` in the record. When the project is a git checkout whose source cannot be read, the field says `unbindable` and no listing is saved.
+- **Not yet:** the rest of the orchestrator. Checks that depend on it are refused by name.
+- **Refused as not ported:** 30 `utility` verbs (for example `doctor`, `init`, `intent`, `space`), `jump reopen`, `log link`, `log review`, and 3 hooks: `continue-workflow`, `deliver-stage-rules` and `fold-usage`.
 - **Not available:** published binaries, installers and a harness installer. Adapters for Cursor and GitHub Copilot do not exist yet, so in practice only Claude Code hooks work.
 - `graph resolve` runs only when `FOCUS_GRAPH_RESOLVE=1` is set.
 
